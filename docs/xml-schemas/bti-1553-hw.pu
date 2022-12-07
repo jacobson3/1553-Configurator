@@ -1,0 +1,897 @@
+@startuml
+
+class AcyclicFrame1553Type {
+    +commandMessageRef : SchedMessageRef1553Type[]
+    +commandGap : SchedGap1553Type[]
+    +commandPulse : SchedPulseType[]
+    +commandHalt : SchedHaltType[]
+    +commandLog : SchedLog1553Type[]
+    +commandPause : SchedPauseType[]
+    +commandRestart : SchedRestartType[]
+    +ID : int
+    +name : string
+}
+class AcyclicFrames1553Type {
+    +acyclicFrame : AcyclicFrame1553Type[]
+}
+class AsyncMessageList429Type {
+    +messageBuffers : MessageBuffers429Type
+    +asyncBufferMaxSize : unsignedInt
+}
+class BitCountError1553Type {
+    +wordPos : wordPos1553Group_wordPos
+    +value : string
+    +count : int
+}
+class BuiltInTestType {
+    +eventLogOnECC : boolean
+    +eventLogOnSEU : boolean
+    +eventLogOnProtocolError : boolean
+    +eventLogOnSystemMonitor : boolean
+}
+class BusController1553Type {
+    +messageBuffers : MessageBuffers1553Type
+    +messages : Messages1553Type
+    +minorFrames : MinorFrames1553Type
+    +majorFrames : MajorFrames1553Type
+    +acyclicFrames : AcyclicFrames1553Type
+    +syncOutputs : SyncOutputsType
+    +triggerInputs : TriggerInputsType
+    +ID : int
+    +name : string
+    +schemaVersion : schemaVersionGroup_schemaVersion
+    +scheduleMaxEntries : unsignedInt
+    +scheduleIDRef : int
+    +triggerMode : BusController1553Type_triggerMode
+    +eventLogOnHalt : boolean
+    +eventLogOnPause : boolean
+    +stepMode : boolean
+    +syncMode : BusController1553Type_syncMode
+    +defaultGap : decimal
+    +timeout : decimal
+}
+enum BusController1553Type_syncMode {
+    Selective = Selective
+    All = All
+}
+enum BusController1553Type_triggerMode {
+    None = None
+    External = External
+    Start = Start
+}
+class BusMonitor1553Type {
+    +rtFilters : RTFilters1553Type
+    +ID : int
+    +name : string
+    +schemaVersion : schemaVersionGroup_schemaVersion
+    +statistics : boolean
+}
+class Channel1553Type {
+    +simulation : Simulation1553Type
+    +playback : Playback1553Type
+    +ID : int
+    +name : string
+    +schemaVersion : schemaVersionGroup_schemaVersion
+    +hardwareChannel : int
+    +channelBufferMaxSizeKB : unsignedInt
+    +amplitudeAdjustEnable : boolean
+    +amplitudePercent : decimal
+    +termination : Channel1553Type_termination
+    +modeCodes : Channel1553Type_modeCodes
+    +broadcast : boolean
+}
+enum Channel1553Type_modeCodes {
+    MC01 = MC01
+    MC1 = MC1
+    MC0 = MC0
+    None = None
+}
+enum Channel1553Type_termination {
+    Off = Off
+    OnA = OnA
+    OnB = OnB
+    On = On
+}
+class Channel429Type {
+    +txChannel : TxChannel429Type
+    +rxChannel : RxChannel429Type
+    +ID : int
+    +name : string
+    +schemaVersion : schemaVersionGroup_schemaVersion
+    +hardwareChannel : int
+    +channelBufferMaxSizeKB : unsignedInt
+    +parity : Channel429Type_parity
+    +enable : boolean
+    +monitorMode : Channel429Type_monitorMode
+    +timeOrHitCount : Channel429Type_timeOrHitCount
+    +statistics : boolean
+    +selfTestBus : boolean
+}
+enum Channel429Type_monitorMode {
+    Selective = Selective
+    All = All
+}
+enum Channel429Type_parity {
+    Odd = Odd
+    Even = Even
+    Data = Data
+}
+enum Channel429Type_timeOrHitCount {
+    Time = Time
+    HitCount = HitCount
+    None = None
+}
+class Conditions1553Type {
+    +condition : Conditions1553Type_condition[]
+}
+enum Conditions1553Type_condition {
+    ALWAYS = ALWAYS
+    FAIL = FAIL
+    SRQ = SRQ
+    INS = INS
+    SSF = SSF
+    TF = TF
+    BUSY = BUSY
+    ME = ME
+    RESPERR = RESPERR
+    NORESP = NORESP
+    ALTBUS = ALTBUS
+    DIO1ACT = DIO1ACT
+    DIO1NACT = DIO1NACT
+    DIO2ACT = DIO2ACT
+    DIO2NACT = DIO2NACT
+    DIO3ACT = DIO3ACT
+    DIO3NACT = DIO3NACT
+    DIO4ACT = DIO4ACT
+    DIO4NACT = DIO4NACT
+}
+class Conditions429Type {
+    +condition : Conditions429Type_condition[]
+}
+enum Conditions429Type_condition {
+    ALWAYS = ALWAYS
+    DIO1ACT = DIO1ACT
+    DIO1NACT = DIO1NACT
+    DIO2ACT = DIO2ACT
+    DIO2NACT = DIO2NACT
+    DIO3ACT = DIO3ACT
+    DIO3NACT = DIO3NACT
+    DIO4ACT = DIO4ACT
+    DIO4NACT = DIO4NACT
+}
+class CoreConfigurationType {
+    +sequentialLog : SequentialLogType
+    +builtInTest : BuiltInTestType
+    +pxi : PxiType
+    +sysMon : SysMonType
+    +timing : TimingType
+    +enableInterrupts : boolean
+}
+class CoreType {
+    +coreConfiguration : CoreConfigurationType
+    +channel1553 : Channel1553Type[]
+    +channel429 : Channel429Type[]
+    +ID : int
+    +name : string
+    +schemaVersion : schemaVersionGroup_schemaVersion
+}
+class DefinedError1553Type {
+    +gapError : GapError1553Type
+    +wordCountError : WordCountError1553Type
+    +bitCountError : BitCountError1553Type
+    +manchesterError : ManchesterError1553Type
+    +syncError : SyncError1553Type
+    +parityError : ParityError1553Type
+    +zeroCrossingError : ZeroCrossingError1553Type
+    +ID : int
+    +name : string
+}
+class DefinedErrors1553Type {
+    +definedError : DefinedError1553Type[]
+}
+class DioBankMaskType {
+    +bankNum : int
+    +riseMask : hexBinary
+    +fallMask : hexBinary
+}
+class DioBankMasksType {
+    +dioBankMask : DioBankMaskType[]
+}
+class ErrorInjection1553Type {
+    +definedErrors : DefinedErrors1553Type
+    +state : ErrorInjection1553Type_state
+    +errorMessages : ErrorInjection1553Type_errorMessages
+    +preloadedErrorIDRef : int
+}
+enum ErrorInjection1553Type_errorMessages {
+    Tagged = Tagged
+    Any = Any
+}
+enum ErrorInjection1553Type_state {
+    Off = Off
+    On = On
+    Once = Once
+    External = External
+}
+class GapError1553Type {
+    +wordPos : wordPos1553Group_wordPos
+    +gapLength : decimal
+}
+class Label429Type {
+    +labelBuffer : LabelBuffer429Type
+    +syncOutputs : SyncOutputsType
+    +ID : int
+    +name : string
+    +monitor : boolean
+    +labelDecimal : int
+    +SDI : Label429Type_SDI
+    +timeOrHitCount : Label429Type_timeOrHitCount
+    +eventLog : boolean
+}
+enum Label429Type_SDI {
+    All = All
+    00 = 00
+    01 = 01
+    10 = 10
+    11 = 11
+}
+enum Label429Type_timeOrHitCount {
+    Time = Time
+    HitCount = HitCount
+}
+class LabelBuffer429Type {
+    +bufferMaxEntries : unsignedInt
+    +bufferType : LabelBuffer429Type_bufferType
+    +eventLogOnFull : boolean
+}
+enum LabelBuffer429Type_bufferType {
+    FIFO = FIFO
+}
+class Labels429Type {
+    +label : Label429Type[]
+}
+class MajorFrame1553Type {
+    +minorFrameRef : MinorFrameRef1553Type[]
+    +ID : int
+    +name : string
+    +loopCount : int
+}
+class MajorFrames1553Type {
+    +majorFrame : MajorFrame1553Type[]
+}
+class ManchesterError1553Type {
+    +wordPos : wordPos1553Group_wordPos
+    +half : ManchesterError1553Type_half
+    +bitPos : int
+}
+enum ManchesterError1553Type_half {
+    First = First
+    Second = Second
+}
+class Message1553Type {
+    +messageBCRT : MessageBCRT1553Type
+    +messageRTBC : MessageRTBC1553Type
+    +messageRTRT : MessageRTRT1553Type
+    +messageMC : MessageMC1553Type
+    +retryConditions : Conditions1553Type
+    +syncOutputs : SyncOutputsType
+    +triggerInputs : TriggerInputsType
+    +ID : int
+    +name : string
+    +enable : boolean
+    +dataWipe : message1553Group_dataWipe
+    +allowErrorInjection : boolean
+    +messageBufferIDRef : int
+    +eventLog : boolean
+    +syncOutput : boolean
+    +monitor : boolean
+    +timeOrHitCount : message1553Group_timeOrHitCount
+    +elapseMinOrMax : message1553Group_elapseMinOrMax
+    +bus : Message1553Type_bus
+    +retryCount : int
+}
+enum Message1553Type_bus {
+    A = A
+    B = B
+}
+class Message429Type {
+    +messageBuffers : MessageBuffers429Type
+    +triggerInputs : TriggerInputsType
+    +syncOutputs : SyncOutputsType
+    +ID : int
+    +name : string
+    +messageBufferIDRef : int
+    +enable : boolean
+    +singleShot : boolean
+    +monitor : boolean
+    +minRate : int
+    +maxRate : int
+    +dataWipe : Message429Type_dataWipe
+    +eventLog : boolean
+    +syncOutput : boolean
+    +triggerInput : boolean
+    +parityError : boolean
+    +labelDecimal : int
+    +SDI : Message429Type_SDI
+    +timeOrHitCount : Message429Type_timeOrHitCount
+}
+enum Message429Type_SDI {
+    Off = Off
+    00 = 00
+    01 = 01
+    10 = 10
+    11 = 11
+}
+enum Message429Type_dataWipe {
+    Zeroes = Zeroes
+    123 = 123
+    None = None
+}
+enum Message429Type_timeOrHitCount {
+    Time = Time
+    HitCount = HitCount
+}
+class MessageBCRT1553Type {
+    +taVal1 : byte
+    +saVal1 : byte
+    +wordCount1 : byte
+}
+class MessageBuffer1553Type {
+    +messageData : MessageData1553Type[]
+    +ID : int
+    +name : string
+    +bufferMaxEntries : int
+    +bufferType : MessageBuffer1553Type_bufferType
+    +eventLogOnEmptyOrFull : boolean
+    +eventLogOnHalf : boolean
+}
+enum MessageBuffer1553Type_bufferType {
+    FIFO = FIFO
+    Circular = Circular
+}
+class MessageBuffer429Type {
+    +rawData : hexBinary[]
+    +ID : int
+    +name : string
+    +bufferMaxEntries : unsignedInt
+    +bufferType : MessageBuffer429Type_bufferType
+    +eventLogOnEmpty : boolean
+}
+enum MessageBuffer429Type_bufferType {
+    FIFO = FIFO
+    Circular = Circular
+}
+class MessageBuffers1553Type {
+    +messageBuffer : MessageBuffer1553Type[]
+}
+class MessageBuffers429Type {
+    +messageBuffer : MessageBuffer429Type[]
+}
+class MessageData1553Type {
+    +messageDataWord : hexBinary[]
+}
+class MessageMC1553Type {
+    +taVal1 : byte
+    +saVal1 : MessageMC1553Type_saVal1
+    +modeCodeNumber : byte
+    +direction : MessageMC1553Type_direction
+}
+enum MessageMC1553Type_direction {
+    Rx = Rx
+    Tx = Tx
+}
+enum MessageMC1553Type_saVal1 {
+    0 = 0
+    31 = 31
+}
+class MessageRTBC1553Type {
+    +taVal1 : byte
+    +saVal1 : byte
+    +wordCount1 : byte
+}
+class MessageRTRT1553Type {
+    +taVal1 : byte
+    +saVal1 : byte
+    +wordCount1 : byte
+    +taVal2 : byte
+    +saVal2 : byte
+    +wordCount2 : byte
+}
+class Messages1553Type {
+    +messageCommand : Message1553Type[]
+}
+class Messages429Type {
+    +message : Message429Type[]
+}
+class MinorFrame1553Type {
+    +commandMessageRef : SchedMessageRef1553Type[]
+    +commandGap : SchedGap1553Type[]
+    +commandPulse : SchedPulseType[]
+    +commandHalt : SchedHaltType[]
+    +commandLog : SchedLog1553Type[]
+    +commandPause : SchedPauseType[]
+    +commandRestart : SchedRestartType[]
+    +ID : int
+    +name : string
+    +frameTime : int
+}
+class MinorFrameRef1553Type {
+    +minorFrameIDRef : int
+}
+class MinorFrames1553Type {
+    +minorFrame : MinorFrame1553Type[]
+}
+class ModeCode1553Type {
+    +ID : int
+    +name : string
+    +enable : boolean
+    +dataWipe : message1553Group_dataWipe
+    +allowErrorInjection : boolean
+    +messageBufferIDRef : int
+    +eventLog : boolean
+    +syncOutput : boolean
+    +monitor : boolean
+    +timeOrHitCount : message1553Group_timeOrHitCount
+    +elapseMinOrMax : message1553Group_elapseMinOrMax
+    +modeCodeNumber : byte
+    +direction : ModeCode1553Type_direction
+    +wrap : boolean
+}
+enum ModeCode1553Type_direction {
+    Tx = Tx
+    Rx = Rx
+}
+class ParityError1553Type {
+    +wordPos : wordPos1553Group_wordPos
+}
+class Playback1553Type {
+}
+class PxiType {
+    +source10MHz : boolean
+}
+class RTFilter1553Type {
+    +rtAddress : int
+    +rxSAMask : hexBinary
+    +txSAMask : hexBinary
+    +rxMCMask : hexBinary
+    +txMCMask : hexBinary
+}
+class RTFilters1553Type {
+    +rtFilter : RTFilter1553Type[]
+    +invert : boolean
+}
+class RemoteTerminal1553Type {
+    +messageBuffers : MessageBuffers1553Type
+    +subAddress : SubAddress1553Type[]
+    +modeCode : ModeCode1553Type[]
+    +syncOutputs : SyncOutputsType
+    +ID : int
+    +name : string
+    +schemaVersion : schemaVersionGroup_schemaVersion
+    +rtAddress : byte
+    +rtMode : RemoteTerminal1553Type_rtMode
+    +initialSwd : hexBinary
+    +noBuild : boolean
+    +autoBusy : boolean
+    +dynamicBC : boolean
+    +clearSwdImmediate : boolean
+    +busEnable : RemoteTerminal1553Type_busEnable
+    +dataWipe : RemoteTerminal1553Type_dataWipe
+    +syncMode : RemoteTerminal1553Type_syncMode
+    +responseMode : RemoteTerminal1553Type_responseMode
+    +responseTime : decimal
+}
+enum RemoteTerminal1553Type_busEnable {
+    A = A
+    B = B
+    AB = AB
+    None = None
+}
+enum RemoteTerminal1553Type_dataWipe {
+    Zeroes = Zeroes
+    123 = 123
+    CWD = CWD
+    None = None
+}
+enum RemoteTerminal1553Type_responseMode {
+    1553A = 1553A
+    1553B = 1553B
+}
+enum RemoteTerminal1553Type_rtMode {
+    Simulate = Simulate
+    Monitor = Monitor
+    Disable = Disable
+}
+enum RemoteTerminal1553Type_syncMode {
+    Selective = Selective
+    All = All
+}
+class RemoteTerminals1553Type {
+    +remoteTerminal : RemoteTerminal1553Type[]
+    +schemaVersion : schemaVersionGroup_schemaVersion
+}
+class RxChannel429Type {
+    +labels : Labels429Type
+    +syncOutputs : SyncOutputsType
+    +speed : RxChannel429Type_speed
+    +speedKHz : decimal
+    +eventLogOnError : boolean
+    +defaultBufferMonitor : boolean
+    +defaultBufferMaxEntries : unsignedInt
+    +defaultBufferType : RxChannel429Type_defaultBufferType
+    +defaultBufferEventLog : boolean
+    +defaultBufferEventLogOnFull : boolean
+    +autoLabelFilterMode : RxChannel429Type_autoLabelFilterMode
+}
+enum RxChannel429Type_autoLabelFilterMode {
+    None = None
+    Labels = Labels
+    SDIs = SDIs
+}
+enum RxChannel429Type_defaultBufferType {
+    FIFO = FIFO
+}
+enum RxChannel429Type_speed {
+    Auto = Auto
+    Low = Low
+    High = High
+}
+class SchedGap1553Type {
+    +gapTime : decimal
+}
+class SchedGap429Type {
+    +gapBitTimes : unsignedInt
+    +allowAsync : boolean
+}
+class SchedHaltType {
+}
+class SchedLog1553Type {
+    +eventLogConditions : Conditions1553Type
+    +tag : unsignedShort
+}
+class SchedLog429Type {
+    +eventLogConditions : Conditions429Type
+    +tag : unsignedShort
+}
+class SchedMessageRef1553Type {
+    +messageIDRef : int
+    +singleShot : boolean
+    +skip : boolean
+}
+class SchedMessageRef429Type {
+    +messageIDRef : int
+    +gapBitTimes : unsignedInt
+    +allowAsync : boolean
+}
+class SchedPauseType {
+}
+class SchedPulseType {
+    +dioNum : unsignedByte
+}
+class SchedRestartType {
+}
+class Schedule429Type {
+    +schedMessageRef : SchedMessageRef429Type[]
+    +schedGap : SchedGap429Type[]
+    +schedPulse : SchedPulseType[]
+    +schedHalt : SchedHaltType[]
+    +schedPause : SchedPauseType[]
+    +schedLog : SchedLog429Type[]
+    +schedRestart : SchedRestartType[]
+    +ID : int
+    +name : string
+}
+class Schedules429Type {
+    +schedule : Schedule429Type[]
+}
+class SequentialLogType {
+    +dioBankMasks : DioBankMasksType
+    +perChannelStreaming : boolean
+    +useDMA : boolean
+}
+class Simulation1553Type {
+    +busMonitor : BusMonitor1553Type
+    +busController : BusController1553Type
+    +remoteTerminals : RemoteTerminals1553Type
+    +errorInjection : ErrorInjection1553Type
+}
+class SubAddress1553Type {
+    +ID : int
+    +name : string
+    +enable : boolean
+    +dataWipe : message1553Group_dataWipe
+    +allowErrorInjection : boolean
+    +messageBufferIDRef : int
+    +eventLog : boolean
+    +syncOutput : boolean
+    +monitor : boolean
+    +timeOrHitCount : message1553Group_timeOrHitCount
+    +elapseMinOrMax : message1553Group_elapseMinOrMax
+    +subAddress : byte
+    +direction : SubAddress1553Type_direction
+    +wrap : boolean
+}
+enum SubAddress1553Type_direction {
+    Tx = Tx
+    Rx = Rx
+}
+class SyncError1553Type {
+    +wordPos : wordPos1553Group_wordPos
+}
+class SyncOutputType {
+    +line : SyncOutputType_line
+    +polarity : SyncOutputType_polarity
+}
+enum SyncOutputType_line {
+    A = A
+    B = B
+    C = C
+    PXITRIGA = PXITRIGA
+    PXITRIGB = PXITRIGB
+    PXITRIGC = PXITRIGC
+    PXISTARC = PXISTARC
+}
+enum SyncOutputType_polarity {
+    High = High
+    Low = Low
+}
+class SyncOutputsType {
+    +syncOutput : SyncOutputType[]
+}
+class SysMonType {
+    +temperatureSensors : TemperatureSensorsType
+}
+class TemperatureSensorType {
+    +index : int
+    +sensorName : TemperatureSensorType_sensorName
+    +highThresh : decimal
+    +lowThresh : decimal
+}
+enum TemperatureSensorType_sensorName {
+    FPGA = FPGA
+    XCVR = XCVR
+    Memory = Memory
+    PwrSupply = PwrSupply
+    Processor = Processor
+    IOModule = IOModule
+    PCB = PCB
+}
+class TemperatureSensorsType {
+    +temperatureSensor : TemperatureSensorType[]
+}
+class TimingType {
+    +driftMax : unsignedInt
+    +delayComp : int
+    +irigControlVal : hexBinary
+    +irigYears : unsignedInt
+    +irigType : TimingType_irigType
+    +jumpThreshPPT : unsignedInt
+    +jumpThreshNS : unsignedInt
+    +timerRollover : unsignedLong
+    +timeSourceSelect : TimingType_timeSourceSelect
+    +timeSyncSelect : TimingType_timeSyncSelect
+    +timeEnableUserInputThresh : boolean
+    +timeInputThreshVal : hexBinary
+    +driftSyncSelect : TimingType_driftSyncSelect
+    +driftEnableUserInputThresh : boolean
+    +driftInputThreshVal : hexBinary
+    +resolution : TimingType_resolution
+    +timerValue : unsignedLong
+}
+enum TimingType_driftSyncSelect {
+    None = None
+    PPS0 = PPS0
+    PPS1 = PPS1
+    PWMIRIG0 = PWMIRIG0
+    PWMIRIG1 = PWMIRIG1
+    AMIRIG = AMIRIG
+    10MHZ = 10MHZ
+    HOST = HOST
+}
+enum TimingType_irigType {
+    A = A
+    B = B
+}
+enum TimingType_resolution {
+    1NS = 1NS
+    1US = 1US
+}
+enum TimingType_timeSourceSelect {
+    None = None
+    PPS0 = PPS0
+    PPS1 = PPS1
+    PWMIRIG0 = PWMIRIG0
+    PWMIRIG1 = PWMIRIG1
+    AMIRIG = AMIRIG
+    10MHZ = 10MHZ
+}
+enum TimingType_timeSyncSelect {
+    None = None
+    PPS0 = PPS0
+    PPS1 = PPS1
+    PWMIRIG0 = PWMIRIG0
+    PWMIRIG1 = PWMIRIG1
+    AMIRIG = AMIRIG
+}
+class TriggerInputType {
+    +line : TriggerInputType_line
+    +polarity : TriggerInputType_polarity
+    +condition : TriggerInputType_condition
+}
+enum TriggerInputType_condition {
+    Active = Active
+    Inactive = Inactive
+}
+enum TriggerInputType_line {
+    A = A
+    B = B
+    C = C
+    PXITRIGA = PXITRIGA
+    PXITRIGB = PXITRIGB
+    PXITRIGC = PXITRIGC
+    PXISTARA = PXISTARA
+    PXISTARB = PXISTARB
+    PXISTARC = PXISTARC
+}
+enum TriggerInputType_polarity {
+    High = High
+    Low = Low
+    Rise = Rise
+    Fall = Fall
+}
+class TriggerInputsType {
+    +triggerInput : TriggerInputType[]
+}
+class TxChannel429Type {
+    +asyncMessageList : AsyncMessageList429Type
+    +messages : Messages429Type
+    +schedules : Schedules429Type
+    +triggerInputs : TriggerInputsType
+    +syncOutputs : SyncOutputsType
+    +scheduleIDRef : int
+    +speedKHz : decimal
+    +parametricMode : TxChannel429Type_parametricMode
+    +eventLogOnHalt : boolean
+    +eventLogOnPause : boolean
+    +paused : boolean
+    +scheduleMaxEntries : unsignedInt
+    +scheduleMode : TxChannel429Type_scheduleMode
+    +scheduleBuildMethod : TxChannel429Type_scheduleBuildMethod
+    +scheduleBuildUnit : TxChannel429Type_scheduleBuildUnit
+    +positiveLeg : TxChannel429Type_positiveLeg
+    +negativeLeg : TxChannel429Type_negativeLeg
+    +highVolt : decimal
+    +lowVolt : decimal
+    +nullVolt : decimal
+    +cmBiasVolt : decimal
+    +highRiseTime : decimal
+    +lowRiseTime : decimal
+}
+enum TxChannel429Type_negativeLeg {
+    Signal = Signal
+    Open = Open
+    Ground = Ground
+}
+enum TxChannel429Type_parametricMode {
+    Wave = Wave
+    Off = Off
+}
+enum TxChannel429Type_positiveLeg {
+    Signal = Signal
+    Open = Open
+    Ground = Ground
+}
+enum TxChannel429Type_scheduleBuildMethod {
+    Normal = Normal
+    Quick = Quick
+    Both = Both
+}
+enum TxChannel429Type_scheduleBuildUnit {
+    Millisecond = Millisecond
+    Microsecond = Microsecond
+}
+enum TxChannel429Type_scheduleMode {
+    Rate = Rate
+    Explicit = Explicit
+}
+class WordCountError1553Type {
+    +type : WordCountError1553Type_type
+    +count : int
+}
+enum WordCountError1553Type_type {
+    Relative = Relative
+    Absolute = Absolute
+}
+class ZeroCrossingError1553Type {
+    +wordPos : wordPos1553Group_wordPos
+    +type : ZeroCrossingError1553Type_type
+    +nanoSecShift : int
+    +bitPos : int
+}
+enum ZeroCrossingError1553Type_type {
+    Leading = Leading
+    Mid-bit = Mid-bit
+}
+class busController {
+}
+busController *- BusController1553Type
+class busMonitor {
+}
+busMonitor *- BusMonitor1553Type
+class channel1553 {
+}
+channel1553 *- Channel1553Type
+class channel429 {
+}
+channel429 *- Channel429Type
+class core {
+}
+core *- CoreType
+enum message1553Group_dataWipe {
+    Zeroes = Zeroes
+    CWD = CWD
+    123 = 123
+    None = None
+}
+enum message1553Group_elapseMinOrMax {
+    Elapsetime = Elapsetime
+    Mintime = Mintime
+    Maxtime = Maxtime
+}
+enum message1553Group_timeOrHitCount {
+    Time = Time
+    HitCount = HitCount
+}
+class remoteTerminal {
+}
+remoteTerminal *- RemoteTerminal1553Type
+class remoteTerminals {
+}
+remoteTerminals *- RemoteTerminals1553Type
+enum schemaVersionGroup_schemaVersion {
+    Undefined = Undefined
+    1.0 = 1.0
+    1.1 = 1.1
+    1.2 = 1.2
+    1.3 = 1.3
+}
+enum wordPos1553Group_wordPos {
+    CWD1 = CWD1
+    CWD2 = CWD2
+    SWD1 = SWD1
+    SWD2 = SWD2
+    DWD0 = DWD0
+    DWD1 = DWD1
+    DWD2 = DWD2
+    DWD3 = DWD3
+    DWD4 = DWD4
+    DWD5 = DWD5
+    DWD6 = DWD6
+    DWD7 = DWD7
+    DWD8 = DWD8
+    DWD9 = DWD9
+    DWD10 = DWD10
+    DWD11 = DWD11
+    DWD12 = DWD12
+    DWD13 = DWD13
+    DWD14 = DWD14
+    DWD15 = DWD15
+    DWD16 = DWD16
+    DWD17 = DWD17
+    DWD18 = DWD18
+    DWD19 = DWD19
+    DWD20 = DWD20
+    DWD21 = DWD21
+    DWD22 = DWD22
+    DWD23 = DWD23
+    DWD24 = DWD24
+    DWD25 = DWD25
+    DWD26 = DWD26
+    DWD27 = DWD27
+    DWD28 = DWD28
+    DWD29 = DWD29
+    DWD30 = DWD30
+    DWD31 = DWD31
+}
+
+@enduml

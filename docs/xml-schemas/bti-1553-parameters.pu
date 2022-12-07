@@ -1,0 +1,75 @@
+@startuml
+
+enum address_direction {
+    Rx = Rx
+    Tx = Tx
+}
+enum message_messageType {
+    BC to RT = BC to RT
+    RT to BC = RT to BC
+    RT to RT = RT to RT
+    MC = MC
+}
+enum parameter_encoding {
+    BNR = BNR
+    BCD = BCD
+    Discrete = Discrete
+}
+class parameters {
+    +channel : channel[]
+}
+parameters +-- channel
+class channel {
+    +hardwareChannel : int
+    +terminals : terminals
+    +acyclicFrame : acyclicFrame[]
+    +message : message[]
+}
+channel +-- terminals
+class terminals {
+    +terminal : terminal[]
+}
+terminals +-- terminal
+class terminal {
+    +terminalAddress : int
+    +terminalName : string
+}
+channel +-- acyclicFrame
+class acyclicFrame {
+    +createTriggerChannel : boolean
+    +name : string
+}
+channel +-- message
+class message {
+    +name : string
+    +address : address[]
+    +messageType : message_messageType
+    +numberOfWords : int
+    +modeCode : int
+    +createTimestampChannel : boolean
+    +parameters : parameters
+}
+message +-- address
+class address {
+    +terminalAddress : int
+    +subAddress : int
+    +direction : address_direction
+}
+message +-- parameters
+class parameters {
+    +parameter : parameter[]
+}
+parameters +-- parameter
+class parameter {
+    +encoding : parameter_encoding[]
+    +signed : boolean[]
+    +startBit : int[]
+    +numberOfBits : int[]
+    +scale : double[]
+    +offset : double[]
+    +name : string[]
+    +unit : string[]
+    +defaultValue : double[]
+}
+
+@enduml
