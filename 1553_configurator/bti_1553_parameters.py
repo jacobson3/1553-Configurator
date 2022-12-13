@@ -32,7 +32,7 @@ class Parameters:
             "type": "Element",
             "min_occurs": 1,
             "max_occurs": 256,
-        }
+        },
     )
 
     @dataclass
@@ -45,26 +45,26 @@ class Parameters:
                 "required": True,
                 "min_inclusive": 0,
                 "max_inclusive": 255,
-            }
+            },
         )
         terminals: Optional["Parameters.Channel.Terminals"] = field(
             default=None,
             metadata={
                 "type": "Element",
-            }
+            },
         )
         acyclic_frame: List["Parameters.Channel.AcyclicFrame"] = field(
             default_factory=list,
             metadata={
                 "name": "acyclicFrame",
                 "type": "Element",
-            }
+            },
         )
         message: List["Parameters.Channel.Message"] = field(
             default_factory=list,
             metadata={
                 "type": "Element",
-            }
+            },
         )
 
         @dataclass
@@ -75,7 +75,7 @@ class Parameters:
                     "type": "Element",
                     "min_occurs": 1,
                     "max_occurs": 32,
-                }
+                },
             )
 
             @dataclass
@@ -88,14 +88,14 @@ class Parameters:
                         "required": True,
                         "min_inclusive": 0,
                         "max_inclusive": 31,
-                    }
+                    },
                 )
                 terminal_name: Optional[str] = field(
                     default=None,
                     metadata={
                         "name": "terminalName",
                         "type": "Element",
-                    }
+                    },
                 )
 
         @dataclass
@@ -105,35 +105,36 @@ class Parameters:
                 metadata={
                     "name": "createTriggerChannel",
                     "type": "Element",
-                }
+                },
             )
             name: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "required": True,
-                }
+                },
             )
 
         @dataclass
         class Message:
             """
-            :ivar name:
-            :ivar address:
-            :ivar message_type:
-            :ivar number_of_words:
-            :ivar mode_code:
-            :ivar create_timestamp_channel: Automatic creation of read-
+            name:
+            address:
+            message_type:
+            number_of_words:
+            mode_code:
+            create_timestamp_channel: Automatic creation of read-
                 only VeriStand channel for timestamp is only supported
                 for Rx messages/endpoints.
-            :ivar parameters:
+            parameters:
             """
+
             name: Optional[str] = field(
                 default=None,
                 metadata={
                     "type": "Element",
                     "required": True,
-                }
+                },
             )
             address: List["Parameters.Channel.Message.Address"] = field(
                 default_factory=list,
@@ -141,7 +142,7 @@ class Parameters:
                     "type": "Element",
                     "min_occurs": 1,
                     "max_occurs": 2,
-                }
+                },
             )
             message_type: Optional[MessageMessageType] = field(
                 default=None,
@@ -149,7 +150,7 @@ class Parameters:
                     "name": "messageType",
                     "type": "Element",
                     "required": True,
-                }
+                },
             )
             number_of_words: Optional[int] = field(
                 default=None,
@@ -159,7 +160,7 @@ class Parameters:
                     "required": True,
                     "min_inclusive": 0,
                     "max_inclusive": 32,
-                }
+                },
             )
             mode_code: Optional[int] = field(
                 default=None,
@@ -168,20 +169,20 @@ class Parameters:
                     "type": "Element",
                     "min_inclusive": 0,
                     "max_inclusive": 31,
-                }
+                },
             )
             create_timestamp_channel: Optional[bool] = field(
                 default=None,
                 metadata={
                     "name": "createTimestampChannel",
                     "type": "Element",
-                }
+                },
             )
             parameters: Optional["Parameters.Channel.Message.Parameters"] = field(
                 default=None,
                 metadata={
                     "type": "Element",
-                }
+                },
             )
 
             @dataclass
@@ -194,7 +195,7 @@ class Parameters:
                         "required": True,
                         "min_inclusive": 0,
                         "max_inclusive": 31,
-                    }
+                    },
                 )
                 sub_address: Optional[int] = field(
                     default=None,
@@ -204,14 +205,14 @@ class Parameters:
                         "required": True,
                         "min_inclusive": 0,
                         "max_inclusive": 31,
-                    }
+                    },
                 )
                 direction: AddressDirection = field(
                     default=AddressDirection.RX,
                     metadata={
                         "type": "Element",
                         "required": True,
-                    }
+                    },
                 )
 
             @dataclass
@@ -221,34 +222,35 @@ class Parameters:
                     metadata={
                         "type": "Element",
                         "min_occurs": 1,
-                    }
+                    },
                 )
 
                 @dataclass
                 class Parameter:
                     """
-                    :ivar encoding:
-                    :ivar signed:
-                    :ivar start_bit:
-                    :ivar number_of_bits:
-                    :ivar scale:
-                    :ivar offset:
-                    :ivar name: For Discrete encoding, there is one
+                    encoding:
+                    signed:
+                    start_bit:
+                    number_of_bits:
+                    scale:
+                    offset:
+                    name: For Discrete encoding, there is one
                         "name" element per Bit
-                    :ivar unit:
-                    :ivar default_value:
+                    unit:
+                    default_value:
                     """
+
                     encoding: List[ParameterEncoding] = field(
                         default_factory=list,
                         metadata={
                             "type": "Element",
-                        }
+                        },
                     )
                     signed: List[bool] = field(
                         default_factory=list,
                         metadata={
                             "type": "Element",
-                        }
+                        },
                     )
                     start_bit: List[int] = field(
                         default_factory=list,
@@ -257,7 +259,7 @@ class Parameters:
                             "type": "Element",
                             "min_inclusive": 0,
                             "max_inclusive": 511,
-                        }
+                        },
                     )
                     number_of_bits: List[int] = field(
                         default_factory=list,
@@ -266,36 +268,36 @@ class Parameters:
                             "type": "Element",
                             "min_inclusive": 1,
                             "max_inclusive": 53,
-                        }
+                        },
                     )
                     scale: List[float] = field(
                         default_factory=list,
                         metadata={
                             "type": "Element",
-                        }
+                        },
                     )
                     offset: List[float] = field(
                         default_factory=list,
                         metadata={
                             "type": "Element",
-                        }
+                        },
                     )
                     name: List[str] = field(
                         default_factory=list,
                         metadata={
                             "type": "Element",
-                        }
+                        },
                     )
                     unit: List[str] = field(
                         default_factory=list,
                         metadata={
                             "type": "Element",
-                        }
+                        },
                     )
                     default_value: List[float] = field(
                         default_factory=list,
                         metadata={
                             "name": "defaultValue",
                             "type": "Element",
-                        }
+                        },
                     )
