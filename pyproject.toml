@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "1553-Configurator"
+name = "VeriStand-1553-Configurator"
 version = "0.1.0"
 description = ""
 authors = ["Matt Jacobson"]
@@ -7,6 +7,10 @@ authors = ["Matt Jacobson"]
 [tool.poetry.dependencies]
 python = "^3.7"
 xsdata = {extras = ["cli", "lxml", "soap"], version = "^22.11"}
+pandas = [
+    {version="<1.4.0", python="<3.8"}, 
+    {version=">=1.4.0", python="^3.8"}
+]
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
