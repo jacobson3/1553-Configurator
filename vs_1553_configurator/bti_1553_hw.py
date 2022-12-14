@@ -3049,7 +3049,8 @@ class Message1553Type:
 class Message429Type:
     """A single ARINC 429 transmit message.
 
-    The message can be added to a transmit schedule node (when txChannel.scheduleMode is "Explicit") or will be automatically scheduled if enabled (when txChannel.scheduleMode = "Rate").
+    The message can be added to a transmit schedule node (when txChannel.scheduleMode is "Explicit")
+    or will be automatically scheduled if enabled (when txChannel.scheduleMode = "Rate").
 
     message_buffers:
     trigger_inputs:
@@ -3823,7 +3824,9 @@ class Messages1553Type:
 class Messages429Type:
     """A collection of ARINC 429 transmit messages.
 
-    Each message defined here can be added to a transmit schedule node (when txChannel.scheduleMode is "Explicit") or will be automatically scheduled if enabled (when txChannel.scheduleMode = "Rate").
+    Each message defined here can be added to a transmit schedule node (when txChannel.scheduleMode
+    is "Explicit") or will be automatically scheduled if enabled
+    (when txChannel.scheduleMode = "Rate").
     """
 
     message: List[Message429Type] = field(
