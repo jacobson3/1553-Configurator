@@ -1,10 +1,5 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from enum import Enum
-from vs_1553_configurator.bti_1553_parameters import (
-    Parameters,
-    AddressDirection,
-    MessageMessageType,
-)
 
 
 class MC_Direction(Enum):
@@ -42,13 +37,6 @@ class Message(ABC):
     @options.setter
     def options(self, options: dict):
         self._options = options
-
-    @abstractmethod
-    def create_parameter_message(self) -> Parameters.Channel.Message:
-        """
-        Create Message dataclass object to be flattened to parameters XML
-        """
-        pass
 
 
 class BC_RT_Message(Message):
@@ -98,17 +86,6 @@ class BC_RT_Message(Message):
     def words(self, words: int):
         self._words = words
 
-    def create_parameter_message(self) -> Parameters.Channel.Message:
-        address = Parameters.Channel.Message.Address(
-            self.terminal_address, self.sub_address, AddressDirection.RX
-        )
-
-        message = Parameters.Channel.Message(
-            self.name, [address], MessageMessageType.BC_TO_RT, self.words
-        )
-
-        return message
-
 
 class RT_BC_Message(Message):
     """
@@ -156,17 +133,6 @@ class RT_BC_Message(Message):
     @words.setter
     def words(self, words: int):
         self._words = words
-
-    def create_parameter_message(self) -> Parameters.Channel.Message:
-        address = Parameters.Channel.Message.Address(
-            self.terminal_address, self.sub_address, AddressDirection.TX
-        )
-
-        message = Parameters.Channel.Message(
-            self.name, [address], MessageMessageType.RT_TO_BC, self.words
-        )
-
-        return message
 
 
 class RT_RT_Message(Message):
@@ -247,21 +213,6 @@ class RT_RT_Message(Message):
     def words(self, words: int):
         self._words = words
 
-    def create_parameter_message(self) -> Parameters.Channel.Message:
-        address1 = Parameters.Channel.Message.Address(
-            self.terminal_address1, self.sub_address1, AddressDirection.RX
-        )
-
-        address2 = Parameters.Channel.Message.Address(
-            self.terminal_address2, self.sub_address2, AddressDirection.TX
-        )
-
-        message = Parameters.Channel.Message(
-            self.name, [address1, address2], MessageMessageType.RT_TO_RT, self.words
-        )
-
-        return message
-
 
 class MC_Message(Message):
     """
@@ -340,38 +291,3 @@ class MC_Message(Message):
     @direction.setter
     def direction(self, direction: MC_Direction):
         self._direction = direction
-
-    def create_parameter_message(self) -> Parameters.Channel.Message:
-
-        mc_direction = (
-            AddressDirection.RX if self.direction == MC_Direction.RX else AddressDirection.TX
-        )
-
-        address = Parameters.Channel.Message.Address(
-            self.terminal_address, self.sub_address, mc_direction
-        )
-
-        message = Parameters.Channel.Message(
-            self.name, [address], MessageMessageType.MC, self.words, mode_code=self.mode_code
-        )
-
-        return message
-
-
-if __name__ == "__main__":
-    from xsdata.formats.dataclass.serializers import XmlSerializer
-
-    message_list = []
-    message_list.append(BC_RT_Message("bcrt_test_message", 3, 21, 5))
-    message_list.append(RT_BC_Message("rtbc_test_message", 15, 3, 4))
-    message_list.append(RT_RT_Message("rtrt_test_message", 15, 20, 1, 20, 4))
-    message_list.append(MC_Message("mc_test_message", 1, 31, 1, 17, MC_Direction.RX))
-
-    parameter_messages = []
-    for message in message_list:
-        parameter_messages.append(message.create_parameter_message())
-
-    channel = Parameters.Channel(0, message=parameter_messages)
-
-    serializer = XmlSerializer()
-    print(serializer.render(channel))

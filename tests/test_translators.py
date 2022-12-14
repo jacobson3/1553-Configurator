@@ -1,5 +1,6 @@
 from vs_1553_configurator import __version__
-import vs_1553_configurator.builders as builders
+import vs_1553_configurator.types as types
+from vs_1553_configurator.translators import BTI_1553_Translator
 
 
 def test_version():
@@ -12,8 +13,10 @@ def test_bcrt_message_build():
     sub_address = 2
     words = 4
 
-    bcrt = builders.BC_RT_Message(message_name, terminal_address, sub_address, words)
-    parameter_message = bcrt.create_parameter_message()
+    bcrt = types.BC_RT_Message(message_name, terminal_address, sub_address, words)
+    translator = BTI_1553_Translator([bcrt])
+    parameter_messages = translator._create_parameter_messages()
+    parameter_message = parameter_messages[0]
 
     assert parameter_message.name == message_name
     assert parameter_message.message_type.value == "BC to RT"
@@ -31,8 +34,10 @@ def test_rtbc_message_build():
     sub_address = 6
     words = 4
 
-    bcrt = builders.RT_BC_Message(message_name, terminal_address, sub_address, words)
-    parameter_message = bcrt.create_parameter_message()
+    rtbc = types.RT_BC_Message(message_name, terminal_address, sub_address, words)
+    translator = BTI_1553_Translator([rtbc])
+    parameter_messages = translator._create_parameter_messages()
+    parameter_message = parameter_messages[0]
 
     assert parameter_message.name == message_name
     assert parameter_message.message_type.value == "RT to BC"
@@ -52,10 +57,12 @@ def test_rtrt_message_build():
     sub_address2 = 20
     words = 4
 
-    bcrt = builders.RT_RT_Message(
+    rtrt = types.RT_RT_Message(
         message_name, terminal_address1, sub_address1, terminal_address2, sub_address2, words
     )
-    parameter_message = bcrt.create_parameter_message()
+    translator = BTI_1553_Translator([rtrt])
+    parameter_messages = translator._create_parameter_messages()
+    parameter_message = parameter_messages[0]
 
     assert parameter_message.name == message_name
     assert parameter_message.message_type.value == "RT to RT"
@@ -76,12 +83,12 @@ def test_mc_message_build():
     sub_address = 31
     words = 1
     mode_code = 17
-    direction = builders.MC_Direction.RX
+    direction = types.MC_Direction.RX
 
-    bcrt = builders.MC_Message(
-        message_name, terminal_address, sub_address, words, mode_code, direction
-    )
-    parameter_message = bcrt.create_parameter_message()
+    mc = types.MC_Message(message_name, terminal_address, sub_address, words, mode_code, direction)
+    translator = BTI_1553_Translator([mc])
+    parameter_messages = translator._create_parameter_messages()
+    parameter_message = parameter_messages[0]
 
     assert parameter_message.name == message_name
     assert parameter_message.message_type.value == "MC"
