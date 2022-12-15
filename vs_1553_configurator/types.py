@@ -1,5 +1,6 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from enum import Enum
+from typing import List
 
 
 class MC_Direction(Enum):
@@ -37,6 +38,13 @@ class Message(ABC):
     @options.setter
     def options(self, options: dict):
         self._options = options
+
+    @abstractmethod
+    def list_terminals(self) -> List[int]:
+        """
+        Return list of RX and TX terminal addresses used in this message
+        """
+        pass
 
 
 class BC_RT_Message(Message):
@@ -86,6 +94,9 @@ class BC_RT_Message(Message):
     def words(self, words: int):
         self._words = words
 
+    def list_terminals(self) -> List[int]:
+        return [self.terminal_address]
+
 
 class RT_BC_Message(Message):
     """
@@ -133,6 +144,9 @@ class RT_BC_Message(Message):
     @words.setter
     def words(self, words: int):
         self._words = words
+
+    def list_terminals(self) -> List[int]:
+        return [self.terminal_address]
 
 
 class RT_RT_Message(Message):
@@ -213,6 +227,9 @@ class RT_RT_Message(Message):
     def words(self, words: int):
         self._words = words
 
+    def list_terminals(self) -> List[int]:
+        return [self.terminal_address1, self.terminal_address2]
+
 
 class MC_Message(Message):
     """
@@ -291,3 +308,6 @@ class MC_Message(Message):
     @direction.setter
     def direction(self, direction: MC_Direction):
         self._direction = direction
+
+    def list_terminals(self) -> List[int]:
+        return [self.terminal_address]

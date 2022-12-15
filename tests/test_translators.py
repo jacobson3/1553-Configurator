@@ -99,3 +99,18 @@ def test_mc_message_build():
     assert parameter_message.address[0].direction.value == "Rx"
     assert parameter_message.address[0].sub_address == sub_address
     assert parameter_message.address[0].terminal_address == terminal_address
+
+
+def test_create_terminals():
+    message_name = "RT15 to BC"
+    terminal_addresses = [0, 1, 15, 21]
+    sa = 6
+    words = 4
+
+    messages = [types.BC_RT_Message(message_name, ta, sa, words) for ta in terminal_addresses]
+    translator = BTI_1553_Translator(messages)
+    terminals = translator._create_terminals()
+
+    terminals_created = [x.terminal_address for x in terminals.terminal]
+
+    assert terminals_created.sort() == terminal_addresses.sort()

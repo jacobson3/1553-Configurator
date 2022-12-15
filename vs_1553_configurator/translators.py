@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 import vs_1553_configurator.types as types
+from xsdata.formats.dataclass.serializers import XmlSerializer
 from vs_1553_configurator.bti_1553_parameters import (
     Parameters,
     AddressDirection,
@@ -32,7 +33,20 @@ class BTI_1553_Translator(MIL_1553_Translator):
     def __init__(self, messages: List[types.Message]):
         super().__init__(messages)
 
+    def generate_parameters_xml(self) -> str:
+        messages = self._create_parameter_messages()
+        terminals = self._create_terminals()
+        serializer = XmlSerializer()
+
+        channel = Parameters.Channel(0, terminals, message=messages)
+        parameters = Parameters([channel])
+
+        return serializer.render(parameters)
+
     def _create_parameter_messages(self) -> List[Parameters.Channel.Message]:
+        """
+        Create Message dataclasses to be flattened to parameters XML
+        """
         return [self._create_parameter_message(message) for message in self.messages]
 
     def _create_parameter_message(self, message: types.Message) -> Parameters.Channel.Message:
@@ -109,20 +123,35 @@ class BTI_1553_Translator(MIL_1553_Translator):
 
         return parameter_message
 
+    def _create_terminals(self) -> Parameters.Channel.Terminals:
+        terminal_set = set([0])  # Start with BC for now
+        for message in self.messages:
+            terminal_set.update(message.list_terminals())
+
+        # Create terminal object for every item in set
+        terminals = [Parameters.Channel.Terminals.Terminal(terminal) for terminal in terminal_set]
+
+        return Parameters.Channel.Terminals(terminals)
+
 
 if __name__ == "__main__":
-    from xsdata.formats.dataclass.serializers import XmlSerializer
+    from vs_1553_configurator.readers import Excel_1553_Reader
+    import os
+    import xml.dom.minidom
 
-    message_list = []
-    message_list.append(types.BC_RT_Message("bcrt_test_message", 3, 21, 5))
-    message_list.append(types.RT_BC_Message("rtbc_test_message", 15, 3, 4))
-    message_list.append(types.RT_RT_Message("rtrt_test_message", 15, 20, 1, 20, 4))
-    message_list.append(types.MC_Message("mc_test_message", 1, 31, 1, 17, types.MC_Direction.RX))
+    # Get path to config file
+    absolute_path = os.path.dirname(__file__)
+    relative_path = "docs/example configurations/1553Config.xlsx"
+    config_path = os.path.abspath(os.path.join(absolute_path, "..", relative_path))
 
-    translator = BTI_1553_Translator(message_list)
-    parameter_messages = translator._create_parameter_messages()
+    # Load config
+    reader = Excel_1553_Reader()
+    reader.load_configuration(config_path)
 
-    channel = Parameters.Channel(0, message=parameter_messages)
+    # Translate config
+    translator = BTI_1553_Translator(reader.messages)
+    xml_string = translator.generate_parameters_xml()
 
-    serializer = XmlSerializer()
-    print(serializer.render(channel))
+    # Pretty print
+    dom_xml = xml.dom.minidom.parseString(xml_string)
+    print(dom_xml.toprettyxml())
