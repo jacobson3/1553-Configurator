@@ -7,7 +7,7 @@ def test_version():
     assert __version__ == "0.1.0"
 
 
-def test_bcrt_message_build():
+def test_create_parameter_bcrt():
     message_name = "BC to RT1 (SA2)"
     terminal_address = 1
     sub_address = 2
@@ -28,7 +28,7 @@ def test_bcrt_message_build():
     assert parameter_message.address[0].terminal_address == terminal_address
 
 
-def test_rtbc_message_build():
+def test_create_parameter_rtbc():
     message_name = "RT15 to BC"
     terminal_address = 15
     sub_address = 6
@@ -49,7 +49,7 @@ def test_rtbc_message_build():
     assert parameter_message.address[0].terminal_address == terminal_address
 
 
-def test_rtrt_message_build():
+def test_create_parameter_rtrt():
     message_name = "RT1 to RT15"
     terminal_address1 = 15
     sub_address1 = 20
@@ -77,7 +77,7 @@ def test_rtrt_message_build():
     assert parameter_message.address[1].terminal_address == terminal_address2
 
 
-def test_mc_message_build():
+def test_create_parameter_mc():
     message_name = "MC 17"
     terminal_address = 1
     sub_address = 31
@@ -101,7 +101,7 @@ def test_mc_message_build():
     assert parameter_message.address[0].terminal_address == terminal_address
 
 
-def test_create_terminals():
+def test_create_parameter_terminals():
     message_name = "RT15 to BC"
     terminal_addresses = [0, 1, 15, 21]
     sa = 6
@@ -109,7 +109,7 @@ def test_create_terminals():
 
     messages = [types.BC_RT_Message(message_name, ta, sa, words) for ta in terminal_addresses]
     translator = BTI_1553_Translator(messages)
-    terminals = translator._create_terminals()
+    terminals = translator._create_parameter_terminals()
 
     terminals_created = [x.terminal_address for x in terminals.terminal]
 

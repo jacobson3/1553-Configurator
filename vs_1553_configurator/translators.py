@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import List
 import vs_1553_configurator.types as types
 from xsdata.formats.dataclass.serializers import XmlSerializer
@@ -21,21 +21,17 @@ class MIL_1553_Translator(ABC):
     def messages(self, messages: List[types.Message]):
         self._messages = messages
 
-    @abstractmethod
-    def _create_parameter_messages(self):
-        """
-        Create Message dataclasses to be flattened to parameters XML
-        """
-        pass
-
 
 class BTI_1553_Translator(MIL_1553_Translator):
     def __init__(self, messages: List[types.Message]):
         super().__init__(messages)
 
     def generate_parameters_xml(self) -> str:
+        """
+        Returns XML string representing the VeriStand parameters XML for BTI 1553 hardware
+        """
         messages = self._create_parameter_messages()
-        terminals = self._create_terminals()
+        terminals = self._create_parameter_terminals()
         serializer = XmlSerializer()
 
         channel = Parameters.Channel(0, terminals, message=messages)
@@ -51,21 +47,21 @@ class BTI_1553_Translator(MIL_1553_Translator):
 
     def _create_parameter_message(self, message: types.Message) -> Parameters.Channel.Message:
         if isinstance(message, types.BC_RT_Message):
-            return self._create_bcrt_message(message)
+            return self._create_parameter_bcrt(message)
 
         elif isinstance(message, types.RT_BC_Message):
-            return self._create_rtbc_message(message)
+            return self._create_parameter_rtbc(message)
 
         elif isinstance(message, types.RT_RT_Message):
-            return self._create_rtrt_message(message)
+            return self._create_parameter_rtrt(message)
 
         elif isinstance(message, types.MC_Message):
-            return self._create_mc_message(message)
+            return self._create_parameter_mc(message)
 
         else:
             raise TypeError(f'{message.name}, type "{type(message)}", should be of type Message')
 
-    def _create_bcrt_message(self, message: types.Message) -> Parameters.Channel.Message:
+    def _create_parameter_bcrt(self, message: types.Message) -> Parameters.Channel.Message:
         address = Parameters.Channel.Message.Address(
             message.terminal_address, message.sub_address, AddressDirection.RX
         )
@@ -76,7 +72,7 @@ class BTI_1553_Translator(MIL_1553_Translator):
 
         return parameter_message
 
-    def _create_rtbc_message(self, message: types.Message) -> Parameters.Channel.Message:
+    def _create_parameter_rtbc(self, message: types.Message) -> Parameters.Channel.Message:
         address = Parameters.Channel.Message.Address(
             message.terminal_address, message.sub_address, AddressDirection.TX
         )
@@ -87,7 +83,7 @@ class BTI_1553_Translator(MIL_1553_Translator):
 
         return parameter_message
 
-    def _create_rtrt_message(self, message: types.Message) -> Parameters.Channel.Message:
+    def _create_parameter_rtrt(self, message: types.Message) -> Parameters.Channel.Message:
         address1 = Parameters.Channel.Message.Address(
             message.terminal_address1, message.sub_address1, AddressDirection.RX
         )
@@ -102,7 +98,7 @@ class BTI_1553_Translator(MIL_1553_Translator):
 
         return parameter_message
 
-    def _create_mc_message(self, message: types.Message) -> Parameters.Channel.Message:
+    def _create_parameter_mc(self, message: types.Message) -> Parameters.Channel.Message:
         mc_direction = (
             AddressDirection.RX
             if message.direction == types.MC_Direction.RX
@@ -123,7 +119,7 @@ class BTI_1553_Translator(MIL_1553_Translator):
 
         return parameter_message
 
-    def _create_terminals(self) -> Parameters.Channel.Terminals:
+    def _create_parameter_terminals(self) -> Parameters.Channel.Terminals:
         terminal_set = set([0])  # Start with BC for now
         for message in self.messages:
             terminal_set.update(message.list_terminals())
