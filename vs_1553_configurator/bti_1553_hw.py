@@ -40,29 +40,29 @@ class BuiltInTestType:
         status register, and an event log entry is generated.
     """
 
-    event_log_on_ecc: bool = field(
-        default=False,
+    event_log_on_ecc: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLogOnECC",
             "type": "Attribute",
         },
     )
-    event_log_on_seu: bool = field(
-        default=False,
+    event_log_on_seu: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLogOnSEU",
             "type": "Attribute",
         },
     )
-    event_log_on_protocol_error: bool = field(
-        default=False,
+    event_log_on_protocol_error: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLogOnProtocolError",
             "type": "Attribute",
         },
     )
-    event_log_on_system_monitor: bool = field(
-        default=False,
+    event_log_on_system_monitor: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLogOnSystemMonitor",
             "type": "Attribute",
@@ -508,8 +508,8 @@ class PxiType:
         duty-cycle source clock is enabled on the PXIe_DSTARC line.
     """
 
-    source10_mhz: bool = field(
-        default=False,
+    source10_mhz: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "source10MHz",
             "type": "Attribute",
@@ -2010,22 +2010,22 @@ class TimingType:
         valid range is from 0 to 2^64-1.
     """
 
-    drift_max: int = field(
-        default=425000000,
+    drift_max: Optional[int] = field(
+        default=None,
         metadata={
             "name": "driftMax",
             "type": "Attribute",
         },
     )
-    delay_comp: int = field(
-        default=0,
+    delay_comp: Optional[int] = field(
+        default=None,
         metadata={
             "name": "delayComp",
             "type": "Attribute",
         },
     )
-    irig_control_val: bytes = field(
-        default=b"\x00\x00\x00\x00",
+    irig_control_val: Optional[bytes] = field(
+        default=None,
         metadata={
             "name": "irigControlVal",
             "type": "Attribute",
@@ -2033,8 +2033,8 @@ class TimingType:
             "format": "base16",
         },
     )
-    irig_years: int = field(
-        default=2000,
+    irig_years: Optional[int] = field(
+        default=None,
         metadata={
             "name": "irigYears",
             "type": "Attribute",
@@ -2042,57 +2042,57 @@ class TimingType:
             "max_inclusive": 2099,
         },
     )
-    irig_type: TimingTypeIrigType = field(
-        default=TimingTypeIrigType.B,
+    irig_type: Optional[TimingTypeIrigType] = field(
+        default=None,
         metadata={
             "name": "irigType",
             "type": "Attribute",
         },
     )
-    jump_thresh_ppt: int = field(
-        default=425000000,
+    jump_thresh_ppt: Optional[int] = field(
+        default=None,
         metadata={
             "name": "jumpThreshPPT",
             "type": "Attribute",
         },
     )
-    jump_thresh_ns: int = field(
-        default=200000,
+    jump_thresh_ns: Optional[int] = field(
+        default=None,
         metadata={
             "name": "jumpThreshNS",
             "type": "Attribute",
         },
     )
-    timer_rollover: int = field(
-        default=31536000000000000,
+    timer_rollover: Optional[int] = field(
+        default=None,
         metadata={
             "name": "timerRollover",
             "type": "Attribute",
         },
     )
-    time_source_select: TimingTypeTimeSourceSelect = field(
-        default=TimingTypeTimeSourceSelect.NONE,
+    time_source_select: Optional[TimingTypeTimeSourceSelect] = field(
+        default=None,
         metadata={
             "name": "timeSourceSelect",
             "type": "Attribute",
         },
     )
-    time_sync_select: TimingTypeTimeSyncSelect = field(
-        default=TimingTypeTimeSyncSelect.NONE,
+    time_sync_select: Optional[TimingTypeTimeSyncSelect] = field(
+        default=None,
         metadata={
             "name": "timeSyncSelect",
             "type": "Attribute",
         },
     )
-    time_enable_user_input_thresh: bool = field(
-        default=False,
+    time_enable_user_input_thresh: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "timeEnableUserInputThresh",
             "type": "Attribute",
         },
     )
-    time_input_thresh_val: bytes = field(
-        default=b"\x00\x00",
+    time_input_thresh_val: Optional[bytes] = field(
+        default=None,
         metadata={
             "name": "timeInputThreshVal",
             "type": "Attribute",
@@ -2100,22 +2100,22 @@ class TimingType:
             "format": "base16",
         },
     )
-    drift_sync_select: TimingTypeDriftSyncSelect = field(
-        default=TimingTypeDriftSyncSelect.NONE,
+    drift_sync_select: Optional[TimingTypeDriftSyncSelect] = field(
+        default=None,
         metadata={
             "name": "driftSyncSelect",
             "type": "Attribute",
         },
     )
-    drift_enable_user_input_thresh: bool = field(
-        default=False,
+    drift_enable_user_input_thresh: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "driftEnableUserInputThresh",
             "type": "Attribute",
         },
     )
-    drift_input_thresh_val: bytes = field(
-        default=b"\x00\x00",
+    drift_input_thresh_val: Optional[bytes] = field(
+        default=None,
         metadata={
             "name": "driftInputThreshVal",
             "type": "Attribute",
@@ -2123,14 +2123,14 @@ class TimingType:
             "format": "base16",
         },
     )
-    resolution: TimingTypeResolution = field(
-        default=TimingTypeResolution.VALUE_1_NS,
+    resolution: Optional[TimingTypeResolution] = field(
+        default=None,
         metadata={
             "type": "Attribute",
         },
     )
-    timer_value: int = field(
-        default=0,
+    timer_value: Optional[int] = field(
+        default=None,
         metadata={
             "name": "timerValue",
             "type": "Attribute",
@@ -2545,8 +2545,8 @@ class SequentialLogType:
             "type": "Attribute",
         },
     )
-    use_dma: bool = field(
-        default=True,
+    use_dma: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "useDMA",
             "type": "Attribute",
@@ -3700,41 +3700,41 @@ class CoreConfigurationType:
         are enabled for the core.
     """
 
-    sequential_log: Optional[SequentialLogType] = field(
-        default=None,
+    sequential_log: SequentialLogType = field(
+        default_factory=SequentialLogType,
         metadata={
             "name": "sequentialLog",
             "type": "Element",
         },
     )
-    built_in_test: Optional[BuiltInTestType] = field(
-        default=None,
+    built_in_test: BuiltInTestType = field(
+        default_factory=BuiltInTestType,
         metadata={
             "name": "builtInTest",
             "type": "Element",
         },
     )
-    pxi: Optional[PxiType] = field(
-        default=None,
+    pxi: PxiType = field(
+        default_factory=PxiType,
         metadata={
             "type": "Element",
         },
     )
-    sys_mon: Optional[SysMonType] = field(
-        default=None,
+    sys_mon: SysMonType = field(
+        default_factory=SysMonType,
         metadata={
             "name": "sysMon",
             "type": "Element",
         },
     )
-    timing: Optional[TimingType] = field(
-        default=None,
+    timing: TimingType = field(
+        default_factory=TimingType,
         metadata={
             "type": "Element",
         },
     )
-    enable_interrupts: bool = field(
-        default=False,
+    enable_interrupts: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "enableInterrupts",
             "type": "Attribute",
@@ -4002,8 +4002,8 @@ class BusController1553Type:
             "required": True,
         },
     )
-    name: str = field(
-        default="",
+    name: Optional[str] = field(
+        default=None,
         metadata={
             "type": "Attribute",
             "min_length": 0,
@@ -4011,15 +4011,15 @@ class BusController1553Type:
             "white_space": "preserve",
         },
     )
-    schema_version: SchemaVersionGroupSchemaVersion = field(
-        default=SchemaVersionGroupSchemaVersion.UNDEFINED,
+    schema_version: Optional[SchemaVersionGroupSchemaVersion] = field(
+        default=None,
         metadata={
             "name": "schemaVersion",
             "type": "Attribute",
         },
     )
-    schedule_max_entries: int = field(
-        default=512,
+    schedule_max_entries: Optional[int] = field(
+        default=None,
         metadata={
             "name": "scheduleMaxEntries",
             "type": "Attribute",
@@ -4034,36 +4034,36 @@ class BusController1553Type:
             "type": "Attribute",
         },
     )
-    trigger_mode: BusController1553TypeTriggerMode = field(
-        default=BusController1553TypeTriggerMode.NONE,
+    trigger_mode: Optional[BusController1553TypeTriggerMode] = field(
+        default=None,
         metadata={
             "name": "triggerMode",
             "type": "Attribute",
         },
     )
-    event_log_on_halt: bool = field(
-        default=False,
+    event_log_on_halt: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLogOnHalt",
             "type": "Attribute",
         },
     )
-    event_log_on_pause: bool = field(
-        default=False,
+    event_log_on_pause: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLogOnPause",
             "type": "Attribute",
         },
     )
-    step_mode: bool = field(
-        default=False,
+    step_mode: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "stepMode",
             "type": "Attribute",
         },
     )
-    sync_mode: BusController1553TypeSyncMode = field(
-        default=BusController1553TypeSyncMode.SELECTIVE,
+    sync_mode: Optional[BusController1553TypeSyncMode] = field(
+        default=None,
         metadata={
             "name": "syncMode",
             "type": "Attribute",
@@ -4716,8 +4716,8 @@ class Channel1553Type:
             "required": True,
         },
     )
-    name: str = field(
-        default="",
+    name: Optional[str] = field(
+        default=None,
         metadata={
             "type": "Attribute",
             "min_length": 0,
@@ -4725,22 +4725,22 @@ class Channel1553Type:
             "white_space": "preserve",
         },
     )
-    schema_version: SchemaVersionGroupSchemaVersion = field(
-        default=SchemaVersionGroupSchemaVersion.UNDEFINED,
+    schema_version: Optional[SchemaVersionGroupSchemaVersion] = field(
+        default=None,
         metadata={
             "name": "schemaVersion",
             "type": "Attribute",
         },
     )
     hardware_channel: int = field(
-        default=-1,
+        default=0,
         metadata={
             "name": "hardwareChannel",
             "type": "Attribute",
         },
     )
-    channel_buffer_max_size_kb: int = field(
-        default=1024,
+    channel_buffer_max_size_kb: Optional[int] = field(
+        default=None,
         metadata={
             "name": "channelBufferMaxSizeKB",
             "type": "Attribute",
@@ -4748,8 +4748,8 @@ class Channel1553Type:
             "max_inclusive": 16384,
         },
     )
-    amplitude_adjust_enable: bool = field(
-        default=False,
+    amplitude_adjust_enable: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "amplitudeAdjustEnable",
             "type": "Attribute",
@@ -4765,21 +4765,21 @@ class Channel1553Type:
             "fraction_digits": 2,
         },
     )
-    termination: Channel1553TypeTermination = field(
-        default=Channel1553TypeTermination.OFF,
+    termination: Optional[Channel1553TypeTermination] = field(
+        default=None,
         metadata={
             "type": "Attribute",
         },
     )
-    mode_codes: Channel1553TypeModeCodes = field(
-        default=Channel1553TypeModeCodes.MC01,
+    mode_codes: Optional[Channel1553TypeModeCodes] = field(
+        default=None,
         metadata={
             "name": "modeCodes",
             "type": "Attribute",
         },
     )
     broadcast: bool = field(
-        default=False,
+        default=True,
         metadata={
             "type": "Attribute",
         },
@@ -4859,7 +4859,6 @@ class CoreType:
 class Channel1553(Channel1553Type):
     class Meta:
         name = "channel1553"
-        namespace = "http://www.ballardtech.com/DatabusSchemas/"
 
 
 @dataclass

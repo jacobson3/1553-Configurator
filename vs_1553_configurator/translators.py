@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List
+from typing import List, Tuple
 import vs_1553_configurator.types as types
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from vs_1553_configurator.bti_1553_parameters import (
@@ -7,6 +7,7 @@ from vs_1553_configurator.bti_1553_parameters import (
     AddressDirection,
     MessageMessageType,
 )
+import vs_1553_configurator.bti_1553_hw as hw
 
 
 class MIL_1553_Translator(ABC):
@@ -25,6 +26,15 @@ class MIL_1553_Translator(ABC):
 class BTI_1553_Translator(MIL_1553_Translator):
     def __init__(self, messages: List[types.Message]):
         super().__init__(messages)
+        self.id = -1
+
+    @property
+    def id(self) -> int:
+        return self._id
+
+    @id.setter
+    def id(self, id: int):
+        self._id = id
 
     def generate_parameters_xml(self) -> str:
         """
@@ -129,11 +139,149 @@ class BTI_1553_Translator(MIL_1553_Translator):
 
         return Parameters.Channel.Terminals(terminals)
 
+    def generate_hw_xml(self) -> str:
+        """
+        Returns XML string representing the VeriStand hardware XML for BTI 1553 hardware
+        """
+        core_id = self.get_uid()
+
+        core_config = hw.CoreConfigurationType()
+        simulation_1553 = hw.Simulation1553Type(bus_controller=self._create_hw_bus_controller())
+        channel_1553 = hw.Channel1553Type(id=self.get_uid(), simulation=simulation_1553)
+
+        core = hw.Core(
+            core_configuration=core_config,
+            channel1553=channel_1553,
+            id=core_id,
+            name="CoreName",
+            schema_version=hw.SchemaVersionGroupSchemaVersion.VALUE_1_1,
+        )
+
+        serializer = XmlSerializer()
+
+        return serializer.render(core, {"bti": hw.__NAMESPACE__})
+
+    def get_uid(self) -> int:
+        """
+        Generate an ID that increases by 1 ever time function is called
+        """
+        self.id += 1
+        return self.id
+
+    def _create_hw_bus_controller(self) -> hw.BusController1553Type:
+        schedule_id = self.get_uid()
+        messages = []
+        message_buffers = []
+
+        # For each message generate bti message and buffer, add to respective list
+        for message in self.messages:
+            hw_message, hw_message_buffer = self._create_hw_message(message)
+            messages.append(hw_message)
+            message_buffers.append(hw_message_buffer)
+
+        hw_message_buffers = hw.MessageBuffers1553Type(message_buffers)
+        hw_messages = hw.Messages1553Type(messages)
+
+        return hw.BusController1553Type(
+            id=self.get_uid(),
+            schedule_idref=schedule_id,
+            messages=hw_messages,
+            message_buffers=hw_message_buffers,
+        )
+
+    def _create_hw_message(
+        self, message: types.Message
+    ) -> Tuple[hw.Message1553Type, hw.MessageBuffers1553Type]:
+        """
+        Generate bti message and message buffer for given 1553 message
+        """
+        buffer_id = self.get_uid()
+
+        if isinstance(message, types.BC_RT_Message):
+            hw_message = self._create_hw_bcrt(message, buffer_id)
+        elif isinstance(message, types.RT_BC_Message):
+            hw_message = self._create_hw_rtbc(message, buffer_id)
+        elif isinstance(message, types.RT_RT_Message):
+            hw_message = self._create_hw_rtrt(message, buffer_id)
+        elif isinstance(message, types.MC_Message):
+            hw_message = self._create_hw_mc(message, buffer_id)
+        else:
+            raise TypeError(f'{message.name}, type "{type(message)}", should be of type Message')
+
+        return (hw_message, self._create_hw_message_buffer(buffer_id))
+
+    def _create_hw_bcrt(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
+        bcrt = hw.MessageBcrt1553Type(
+            message.terminal_address,
+            message.sub_address,
+            message.words,
+        )
+        return hw.Message1553Type(
+            message_bcrt=bcrt,
+            id=self.get_uid(),
+            name=message.name,
+            message_buffer_idref=buffer_id,
+        )
+
+    def _create_hw_rtbc(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
+        rtbc = hw.MessageRtbc1553Type(
+            message.terminal_address,
+            message.sub_address,
+            message.words,
+        )
+        return hw.Message1553Type(
+            message_rtbc=rtbc,
+            id=self.get_uid(),
+            name=message.name,
+            message_buffer_idref=buffer_id,
+        )
+
+    def _create_hw_rtrt(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
+        rtrt = hw.MessageRtrt1553Type(
+            message.terminal_address1,
+            message.sub_address1,
+            message.words,
+            message.terminal_address2,
+            message.sub_address2,
+            message.words,
+        )
+        return hw.Message1553Type(
+            message_rtrt=rtrt,
+            id=self.get_uid(),
+            name=message.name,
+            message_buffer_idref=buffer_id,
+        )
+
+    def _create_hw_mc(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
+        mc_direction = (
+            hw.ModeCode1553TypeDirection.RX
+            if message.direction == types.MC_Direction.RX
+            else hw.ModeCode1553TypeDirection.TX
+        )
+
+        mc = hw.MessageMc1553Type(
+            message.terminal_address,
+            message.sub_address,
+            message.mode_code,
+            mc_direction,
+        )
+        return hw.Message1553Type(
+            message_mc=mc,
+            id=self.get_uid(),
+            name=message.name,
+            message_buffer_idref=buffer_id,
+        )
+
+    def _create_hw_message_buffer(self, id: int) -> hw.MessageBuffer1553Type:
+        buffer_name = f"messageBuffer ID{id}"
+        return hw.MessageBuffer1553Type(id=id, name=buffer_name)
+
 
 if __name__ == "__main__":
     from vs_1553_configurator.readers import Excel_1553_Reader
     import os
-    import xml.dom.minidom
+
+    # import xml.dom.minidom
 
     # Get path to config file
     absolute_path = os.path.dirname(__file__)
@@ -146,8 +294,11 @@ if __name__ == "__main__":
 
     # Translate config
     translator = BTI_1553_Translator(reader.messages)
-    xml_string = translator.generate_parameters_xml()
+    parameters_xml = translator.generate_parameters_xml()
+    hw_xml = translator.generate_hw_xml()
 
     # Pretty print
-    dom_xml = xml.dom.minidom.parseString(xml_string)
-    print(dom_xml.toprettyxml())
+    # dom_parameters = xml.dom.minidom.parseString(parameters_xml)
+    # print(dom_parameters.toprettyxml())
+
+    print(hw_xml)
