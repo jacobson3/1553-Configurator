@@ -191,7 +191,7 @@ class BTI_1553_Translator(MIL_1553_Translator):
 
     def _create_hw_message(
         self, message: types.Message
-    ) -> Tuple[hw.Message1553Type, hw.MessageBuffers1553Type]:
+    ) -> Tuple[hw.Message1553Type, hw.MessageBuffer1553Type]:
         """
         Generate bti message and message buffer for given 1553 message
         """

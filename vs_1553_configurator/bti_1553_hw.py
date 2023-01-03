@@ -1357,8 +1357,8 @@ class MessageBuffer1553Type:
             "white_space": "preserve",
         },
     )
-    buffer_max_entries: int = field(
-        default=1,
+    buffer_max_entries: Optional[int] = field(
+        default=None,
         metadata={
             "name": "bufferMaxEntries",
             "type": "Attribute",
@@ -1366,22 +1366,22 @@ class MessageBuffer1553Type:
             "max_inclusive": 1023,
         },
     )
-    buffer_type: MessageBuffer1553TypeBufferType = field(
-        default=MessageBuffer1553TypeBufferType.FIFO,
+    buffer_type: Optional[MessageBuffer1553TypeBufferType] = field(
+        default=None,
         metadata={
             "name": "bufferType",
             "type": "Attribute",
         },
     )
-    event_log_on_empty_or_full: bool = field(
-        default=False,
+    event_log_on_empty_or_full: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLogOnEmptyOrFull",
             "type": "Attribute",
         },
     )
-    event_log_on_half: bool = field(
-        default=False,
+    event_log_on_half: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLogOnHalf",
             "type": "Attribute",
@@ -2966,21 +2966,21 @@ class Message1553Type:
             "white_space": "preserve",
         },
     )
-    enable: bool = field(
-        default=True,
+    enable: Optional[bool] = field(
+        default=None,
         metadata={
             "type": "Attribute",
         },
     )
-    data_wipe: Message1553GroupDataWipe = field(
-        default=Message1553GroupDataWipe.ZEROES,
+    data_wipe: Optional[Message1553GroupDataWipe] = field(
+        default=None,
         metadata={
             "name": "dataWipe",
             "type": "Attribute",
         },
     )
-    allow_error_injection: bool = field(
-        default=False,
+    allow_error_injection: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "allowErrorInjection",
             "type": "Attribute",
@@ -2993,42 +2993,42 @@ class Message1553Type:
             "type": "Attribute",
         },
     )
-    event_log: bool = field(
-        default=False,
+    event_log: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLog",
             "type": "Attribute",
         },
     )
-    sync_output: bool = field(
-        default=False,
+    sync_output: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "syncOutput",
             "type": "Attribute",
         },
     )
     monitor: bool = field(
-        default=False,
+        default=True,
         metadata={
             "type": "Attribute",
         },
     )
-    time_or_hit_count: Message1553GroupTimeOrHitCount = field(
-        default=Message1553GroupTimeOrHitCount.TIME,
+    time_or_hit_count: Optional[Message1553GroupTimeOrHitCount] = field(
+        default=None,
         metadata={
             "name": "timeOrHitCount",
             "type": "Attribute",
         },
     )
-    elapse_min_or_max: Message1553GroupElapseMinOrMax = field(
-        default=Message1553GroupElapseMinOrMax.ELAPSETIME,
+    elapse_min_or_max: Optional[Message1553GroupElapseMinOrMax] = field(
+        default=None,
         metadata={
             "name": "elapseMinOrMax",
             "type": "Attribute",
         },
     )
-    bus: Message1553TypeBus = field(
-        default=Message1553TypeBus.A,
+    bus: Optional[Message1553TypeBus] = field(
+        default=None,
         metadata={
             "type": "Attribute",
         },
