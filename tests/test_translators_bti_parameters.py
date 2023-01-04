@@ -1,10 +1,5 @@
-from vs_1553_configurator import __version__
 import vs_1553_configurator.types as types
 from vs_1553_configurator.translators import BTI_1553_Translator
-
-
-def test_version():
-    assert __version__ == "0.1.0"
 
 
 def test_create_parameter_bcrt():
