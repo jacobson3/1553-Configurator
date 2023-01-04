@@ -311,3 +311,87 @@ class MC_Message(Message):
 
     def list_terminals(self) -> List[int]:
         return [self.terminal_address]
+
+
+class Frame(ABC):
+    """
+    Abstract 1553 Frame type
+    """
+
+    def __init__(self, name: str, schedule: List[str], options: dict = {}):
+        self.options = options
+        self.name = name
+        self.schedule = schedule
+
+    @property
+    def name(self) -> str:
+        """
+        Frame name
+        """
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        self._name = name
+
+    @property
+    def options(self) -> dict:
+        """
+        Dictionary holding optional/non-standard frame options
+        """
+        return self._options
+
+    @options.setter
+    def options(self, options: dict):
+        self._options = options
+
+    @property
+    def schedule(self) -> List[str]:
+        """
+        List of frames/messages defining schedule of the major frame
+        """
+        return self._schedule
+
+    @schedule.setter
+    def schedule(self, frames: List[str]):
+        self._schedule = frames
+
+
+class MajorFrame(Frame):
+    """
+    Specifies a schedule that can be referenced by the channel for execution
+    """
+
+    def __init__(self, name: str, schedule: List[str], options: dict = {}):
+        super().__init__(name, schedule, options)
+
+
+class AcyclicFrame(Frame):
+    """
+    A schedule of commands and messages that can be transmitted on-demand
+    """
+
+    def __init__(self, name: str, schedule: List[str], options: dict = {}):
+        super().__init__(name, schedule, options)
+
+
+class MinorFrame(Frame):
+    """
+    A schedule of commands and messages that can be referenced in a majorFrame
+    """
+
+    def __init__(self, name: str, schedule: List[str], frame_time: int, options: dict = {}):
+        super().__init__(name, schedule, options)
+        self.frame_time = frame_time
+
+    @property
+    def frame_time(self) -> int:
+        """
+        The length of frame in microseconds. The next minor frame will not begin until this time
+        has elapsed.
+        """
+        return self._frame_time
+
+    @frame_time.setter
+    def frame_time(self, frame_time: int):
+        self._frame_time = frame_time
