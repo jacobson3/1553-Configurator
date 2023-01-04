@@ -3,7 +3,6 @@ from typing import List
 from enum import Enum
 import pandas
 import vs_1553_configurator.types as types
-import numpy as np
 
 
 class MIL_1553_Reader(ABC):
