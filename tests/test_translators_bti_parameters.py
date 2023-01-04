@@ -9,7 +9,7 @@ def test_create_parameter_bcrt():
     words = 4
 
     bcrt = types.BC_RT_Message(message_name, terminal_address, sub_address, words)
-    translator = BTI_1553_Translator([bcrt])
+    translator = BTI_1553_Translator([bcrt], [], [], [])
     parameter_messages = translator._create_parameter_messages()
     parameter_message = parameter_messages[0]
 
@@ -30,7 +30,7 @@ def test_create_parameter_rtbc():
     words = 4
 
     rtbc = types.RT_BC_Message(message_name, terminal_address, sub_address, words)
-    translator = BTI_1553_Translator([rtbc])
+    translator = BTI_1553_Translator([rtbc], [], [], [])
     parameter_messages = translator._create_parameter_messages()
     parameter_message = parameter_messages[0]
 
@@ -55,7 +55,7 @@ def test_create_parameter_rtrt():
     rtrt = types.RT_RT_Message(
         message_name, terminal_address1, sub_address1, terminal_address2, sub_address2, words
     )
-    translator = BTI_1553_Translator([rtrt])
+    translator = BTI_1553_Translator([rtrt], [], [], [])
     parameter_messages = translator._create_parameter_messages()
     parameter_message = parameter_messages[0]
 
@@ -81,7 +81,7 @@ def test_create_parameter_mc():
     direction = types.MC_Direction.RX
 
     mc = types.MC_Message(message_name, terminal_address, sub_address, words, mode_code, direction)
-    translator = BTI_1553_Translator([mc])
+    translator = BTI_1553_Translator([mc], [], [], [])
     parameter_messages = translator._create_parameter_messages()
     parameter_message = parameter_messages[0]
 
@@ -103,7 +103,7 @@ def test_create_parameter_terminals():
     words = 4
 
     messages = [types.BC_RT_Message(message_name, ta, sa, words) for ta in terminal_addresses]
-    translator = BTI_1553_Translator(messages)
+    translator = BTI_1553_Translator(messages, [], [], [])
     terminals = translator._create_parameter_terminals()
 
     terminals_created = [x.terminal_address for x in terminals.terminal]

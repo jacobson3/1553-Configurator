@@ -733,15 +733,15 @@ class SchedMessageRef1553Type:
             "required": True,
         },
     )
-    single_shot: bool = field(
-        default=False,
+    single_shot: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "singleShot",
             "type": "Attribute",
         },
     )
-    skip: bool = field(
-        default=False,
+    skip: Optional[bool] = field(
+        default=None,
         metadata={
             "type": "Attribute",
         },

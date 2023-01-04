@@ -212,7 +212,26 @@ class BTI_1553_Translator(MIL_1553_Translator):
         return self.id
 
     def _create_hw_bus_controller(self) -> hw.BusController1553Type:
-        schedule_id = self.get_uid()
+        id = self.get_uid()
+
+        messages, message_buffers = self._create_hw_messages()
+        acyclic_frames = self._create_hw_acyclic_frames(messages)
+        minor_frames = self._create_hw_minor_frames(messages)
+        major_frames = self._create_hw_major_frames(minor_frames)
+
+        return hw.BusController1553Type(
+            message_buffers,
+            messages,
+            minor_frames,
+            major_frames,
+            acyclic_frames,
+            id=id,
+            schedule_idref=major_frames.major_frame[0].id,
+        )
+
+    def _create_hw_messages(
+        self,
+    ) -> Tuple[hw.Messages1553Type, hw.MessageBuffers1553Type]:
         messages = []
         message_buffers = []
 
@@ -222,15 +241,10 @@ class BTI_1553_Translator(MIL_1553_Translator):
             messages.append(hw_message)
             message_buffers.append(hw_message_buffer)
 
-        hw_message_buffers = hw.MessageBuffers1553Type(message_buffers)
         hw_messages = hw.Messages1553Type(messages)
+        hw_message_buffers = hw.MessageBuffers1553Type(message_buffers)
 
-        return hw.BusController1553Type(
-            id=self.get_uid(),
-            schedule_idref=schedule_id,
-            messages=hw_messages,
-            message_buffers=hw_message_buffers,
-        )
+        return (hw_messages, hw_message_buffers)
 
     def _create_hw_message(
         self, message: types.Message
@@ -319,12 +333,73 @@ class BTI_1553_Translator(MIL_1553_Translator):
         buffer_name = f"messageBuffer ID{id}"
         return hw.MessageBuffer1553Type(id=id, name=buffer_name)
 
+    def _create_hw_acyclic_frames(self, messages: hw.Messages1553Type) -> hw.AcyclicFrames1553Type:
+
+        acyclic_frames = [
+            self._create_hw_acyclic_frame(frame, messages) for frame in self.acyclic_frames
+        ]
+
+        return hw.AcyclicFrames1553Type(acyclic_frames)
+
+    def _create_hw_acyclic_frame(
+        self,
+        frame: types.AcyclicFrame,
+        messages: hw.Messages1553Type,
+    ) -> hw.AcyclicFrame1553Type:
+
+        message_ids = [self._get_message_id(name, messages) for name in frame.schedule]
+        message_refs = [hw.SchedMessageRef1553Type(id) for id in message_ids]
+
+        return hw.AcyclicFrame1553Type(message_refs, id=self.get_uid(), name=frame.name)
+
+    def _get_message_id(self, name: str, messages: hw.Messages1553Type) -> int:
+        filtered_messages = list(filter(lambda x: (x.name == name), messages.message_command))
+        return filtered_messages[0].id
+
+    def _create_hw_minor_frames(self, messages: hw.Messages1553Type) -> hw.MinorFrames1553Type:
+
+        minor_frames = [self._create_hw_minor_frame(frame, messages) for frame in self.minor_frames]
+
+        return hw.MinorFrames1553Type(minor_frames)
+
+    def _create_hw_minor_frame(
+        self,
+        frame: types.MinorFrame,
+        messages: hw.Messages1553Type,
+    ) -> hw.MinorFrame1553Type:
+
+        message_ids = [self._get_message_id(name, messages) for name in frame.schedule]
+        message_refs = [hw.SchedMessageRef1553Type(id) for id in message_ids]
+
+        return hw.MinorFrame1553Type(message_refs, id=self.get_uid(), name=frame.name)
+
+    def _create_hw_major_frames(self, frames: hw.MinorFrames1553Type) -> hw.MajorFrames1553Type:
+        scheduled_frame = self.major_frames[0]  # VS only allows for one running major frame
+
+        frame_refs = self._get_frame_refs(scheduled_frame.schedule, frames)
+
+        major_frame = hw.MajorFrame1553Type(frame_refs, self.get_uid(), scheduled_frame.name, 0)
+
+        return hw.MajorFrames1553Type([major_frame])
+
+    def _get_frame_refs(
+        self, schedule: List[str], frames: hw.MinorFrames1553Type
+    ) -> List[hw.MinorFrameRef1553Type]:
+
+        frame_refs = []
+
+        for name in schedule:
+            filtered_frames = list(filter(lambda x: (x.name == name), frames.minor_frame))
+            frame_refs.append(hw.MinorFrameRef1553Type(filtered_frames[0].id))
+
+        return frame_refs
+
 
 if __name__ == "__main__":
     from vs_1553_configurator.readers import Excel_1553_Reader
-    import os
+    import os, sys
 
-    import xml.dom.minidom
+    # import xml.dom.minidom
 
     # Get path to config file
     absolute_path = os.path.dirname(__file__)
@@ -345,7 +420,6 @@ if __name__ == "__main__":
     hw_xml = translator.generate_hw_xml()
 
     # Pretty print
-    dom_parameters = xml.dom.minidom.parseString(parameters_xml)
-    print(dom_parameters.toprettyxml())
-
-    # print(hw_xml)
+    # dom_parameters = xml.dom.minidom.parseString(parameters_xml)
+    # print(dom_parameters.toprettyxml())
+    sys.stdout.write(hw_xml)

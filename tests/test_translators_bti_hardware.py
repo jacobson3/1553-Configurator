@@ -9,7 +9,7 @@ def test_create_parameter_bcrt():
     words = 4
 
     bcrt = types.BC_RT_Message(message_name, terminal_address, sub_address, words)
-    translator = BTI_1553_Translator([bcrt])
+    translator = BTI_1553_Translator([bcrt], [], [], [])
     hw_message, hw_message_buffer = translator._create_hw_message(bcrt)
 
     assert hw_message.name == message_name
@@ -27,7 +27,7 @@ def test_create_parameter_rtbc():
     words = 4
 
     rtbc = types.RT_BC_Message(message_name, terminal_address, sub_address, words)
-    translator = BTI_1553_Translator([rtbc])
+    translator = BTI_1553_Translator([rtbc], [], [], [])
     hw_message, hw_message_buffer = translator._create_hw_message(rtbc)
 
     assert hw_message.name == message_name
@@ -49,7 +49,7 @@ def test_create_parameter_rtrt():
     rtrt = types.RT_RT_Message(
         message_name, terminal_address1, sub_address1, terminal_address2, sub_address2, words
     )
-    translator = BTI_1553_Translator([rtrt])
+    translator = BTI_1553_Translator([rtrt], [], [], [])
     hw_message, hw_message_buffer = translator._create_hw_message(rtrt)
 
     assert hw_message.name == message_name
@@ -72,7 +72,7 @@ def test_create_parameter_mc():
     direction = types.MC_Direction.RX
 
     mc = types.MC_Message(message_name, terminal_address, sub_address, words, mode_code, direction)
-    translator = BTI_1553_Translator([mc])
+    translator = BTI_1553_Translator([mc], [], [], [])
     hw_message, hw_message_buffer = translator._create_hw_message(mc)
 
     assert hw_message.name == message_name
