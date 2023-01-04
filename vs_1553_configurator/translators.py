@@ -11,8 +11,17 @@ import vs_1553_configurator.bti_1553_hw as hw
 
 
 class MIL_1553_Translator(ABC):
-    def __init__(self, messages: List[types.Message]):
+    def __init__(
+        self,
+        messages: List[types.Message],
+        major_frames: List[types.MajorFrame],
+        minor_frames: List[types.MinorFrame],
+        acyclic_frames: List[types.AcyclicFrame],
+    ):
         self.messages = messages
+        self.major_frames = major_frames
+        self.minor_frames = minor_frames
+        self.acyclic_frames = acyclic_frames
 
     @property
     def messages(self) -> List[types.Message]:
@@ -22,10 +31,40 @@ class MIL_1553_Translator(ABC):
     def messages(self, messages: List[types.Message]):
         self._messages = messages
 
+    @property
+    def major_frames(self) -> List[types.MajorFrame]:
+        return self._major_frames
+
+    @major_frames.setter
+    def major_frames(self, frames: List[types.MajorFrame]):
+        self._major_frames = frames
+
+    @property
+    def minor_frames(self) -> List[types.MinorFrame]:
+        return self._minor_frames
+
+    @minor_frames.setter
+    def minor_frames(self, frames: List[types.MinorFrame]):
+        self._minor_frames = frames
+
+    @property
+    def acyclic_frames(self) -> List[types.AcyclicFrame]:
+        return self._acyclic_frames
+
+    @acyclic_frames.setter
+    def acyclic_frames(self, frames: List[types.AcyclicFrame]):
+        self._acyclic_frames = frames
+
 
 class BTI_1553_Translator(MIL_1553_Translator):
-    def __init__(self, messages: List[types.Message]):
-        super().__init__(messages)
+    def __init__(
+        self,
+        messages: List[types.Message],
+        major_frames: List[types.MajorFrame],
+        minor_frames: List[types.MinorFrame],
+        acyclic_frames: List[types.AcyclicFrame],
+    ):
+        super().__init__(messages, major_frames, minor_frames, acyclic_frames)
         self.id = -1
 
     @property
@@ -42,9 +81,10 @@ class BTI_1553_Translator(MIL_1553_Translator):
         """
         messages = self._create_parameter_messages()
         terminals = self._create_parameter_terminals()
+        acyclic_frames = self._create_parameter_acyclic_frames()
         serializer = XmlSerializer()
 
-        channel = Parameters.Channel(0, terminals, message=messages)
+        channel = Parameters.Channel(0, terminals, acyclic_frames, messages)
         parameters = Parameters([channel])
 
         return serializer.render(parameters)
@@ -138,6 +178,9 @@ class BTI_1553_Translator(MIL_1553_Translator):
         terminals = [Parameters.Channel.Terminals.Terminal(terminal) for terminal in terminal_set]
 
         return Parameters.Channel.Terminals(terminals)
+
+    def _create_parameter_acyclic_frames(self) -> List[Parameters.Channel.AcyclicFrame]:
+        return [Parameters.Channel.AcyclicFrame(name=frame.name) for frame in self.acyclic_frames]
 
     def generate_hw_xml(self) -> str:
         """
@@ -281,7 +324,7 @@ if __name__ == "__main__":
     from vs_1553_configurator.readers import Excel_1553_Reader
     import os
 
-    # import xml.dom.minidom
+    import xml.dom.minidom
 
     # Get path to config file
     absolute_path = os.path.dirname(__file__)
@@ -289,16 +332,20 @@ if __name__ == "__main__":
     config_path = os.path.abspath(os.path.join(absolute_path, "..", relative_path))
 
     # Load config
-    reader = Excel_1553_Reader()
-    reader.load_configuration(config_path)
+    reader = Excel_1553_Reader(config_path)
 
     # Translate config
-    translator = BTI_1553_Translator(reader.messages)
+    translator = BTI_1553_Translator(
+        reader.messages,
+        reader.major_frames,
+        reader.minor_frames,
+        reader.acyclic_frames,
+    )
     parameters_xml = translator.generate_parameters_xml()
     hw_xml = translator.generate_hw_xml()
 
     # Pretty print
-    # dom_parameters = xml.dom.minidom.parseString(parameters_xml)
-    # print(dom_parameters.toprettyxml())
+    dom_parameters = xml.dom.minidom.parseString(parameters_xml)
+    print(dom_parameters.toprettyxml())
 
-    print(hw_xml)
+    # print(hw_xml)

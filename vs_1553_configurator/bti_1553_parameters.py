@@ -101,7 +101,7 @@ class Parameters:
         @dataclass
         class AcyclicFrame:
             create_trigger_channel: Optional[bool] = field(
-                default=None,
+                default=True,
                 metadata={
                     "name": "createTriggerChannel",
                     "type": "Element",

@@ -6,11 +6,12 @@ import vs_1553_configurator.types as types
 
 
 class MIL_1553_Reader(ABC):
-    def __init__(self):
+    def __init__(self, config_path: str):
         self.messages = []
         self.major_frames = []
         self.minor_frames = []
         self.acyclic_frames = []
+        self.load_configuration(config_path)
 
     @property
     def messages(self) -> List[types.Message]:
@@ -72,8 +73,8 @@ class Excel_Message_Type(str, Enum):
 
 
 class Excel_1553_Reader(MIL_1553_Reader):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, config_path: str):
+        super().__init__(config_path)
 
     def load_configuration(self, path: str):
         workbook = pandas.read_excel(path, [0, 1, 2])
@@ -189,5 +190,4 @@ if __name__ == "__main__":
     relative_path = "docs/example configurations/1553Config.xlsx"
     config_path = os.path.abspath(os.path.join(absolute_path, "..", relative_path))
 
-    reader = Excel_1553_Reader()
-    reader.load_configuration(config_path)
+    reader = Excel_1553_Reader(config_path)
