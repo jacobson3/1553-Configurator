@@ -97,21 +97,21 @@ class BTI_1553_ParameterTranslator(MIL_1553_Translator):
 
     def _create_message(self, message: types.Message) -> Parameters.Channel.Message:
         if isinstance(message, types.BC_RT_Message):
-            return self._create_bcrt(message)
+            return self._create_bcrt_message(message)
 
         elif isinstance(message, types.RT_BC_Message):
-            return self._create_rtbc(message)
+            return self._create_rtbc_message(message)
 
         elif isinstance(message, types.RT_RT_Message):
-            return self._create_rtrt(message)
+            return self._create_rtrt_message(message)
 
         elif isinstance(message, types.MC_Message):
-            return self._create_mc(message)
+            return self._create_mc_message(message)
 
         else:
             raise TypeError(f'{message.name}, type "{type(message)}", should be of type Message')
 
-    def _create_bcrt(self, message: types.Message) -> Parameters.Channel.Message:
+    def _create_bcrt_message(self, message: types.Message) -> Parameters.Channel.Message:
         address = Parameters.Channel.Message.Address(
             message.terminal_address, message.sub_address, AddressDirection.RX
         )
@@ -122,7 +122,7 @@ class BTI_1553_ParameterTranslator(MIL_1553_Translator):
 
         return parameter_message
 
-    def _create_rtbc(self, message: types.Message) -> Parameters.Channel.Message:
+    def _create_rtbc_message(self, message: types.Message) -> Parameters.Channel.Message:
         address = Parameters.Channel.Message.Address(
             message.terminal_address, message.sub_address, AddressDirection.TX
         )
@@ -133,7 +133,7 @@ class BTI_1553_ParameterTranslator(MIL_1553_Translator):
 
         return parameter_message
 
-    def _create_rtrt(self, message: types.Message) -> Parameters.Channel.Message:
+    def _create_rtrt_message(self, message: types.Message) -> Parameters.Channel.Message:
         address1 = Parameters.Channel.Message.Address(
             message.terminal_address1, message.sub_address1, AddressDirection.RX
         )
@@ -148,7 +148,7 @@ class BTI_1553_ParameterTranslator(MIL_1553_Translator):
 
         return parameter_message
 
-    def _create_mc(self, message: types.Message) -> Parameters.Channel.Message:
+    def _create_mc_message(self, message: types.Message) -> Parameters.Channel.Message:
         mc_direction = (
             AddressDirection.RX
             if message.direction == types.MC_Direction.RX
@@ -206,12 +206,16 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         """
         Returns XML string representing the VeriStand hardware XML for BTI 1553 hardware
         """
-        core_id = self._get_uid()
+        bus_controller = self._create_bus_controller()
+        remote_terminals = self._create_remote_terminals_type()
 
-        core_config = hw.CoreConfigurationType()
-        simulation_1553 = hw.Simulation1553Type(bus_controller=self._create_bus_controller())
+        simulation_1553 = hw.Simulation1553Type(
+            bus_controller=bus_controller, remote_terminals=remote_terminals
+        )
         channel_1553 = hw.Channel1553Type(id=self._get_uid(), simulation=simulation_1553)
 
+        core_id = self._get_uid()
+        core_config = hw.CoreConfigurationType()
         core = hw.Core(
             core_configuration=core_config,
             channel1553=channel_1553,
@@ -275,19 +279,19 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         buffer_id = self._get_uid()
 
         if isinstance(message, types.BC_RT_Message):
-            hw_message = self._create_bcrt(message, buffer_id)
+            hw_message = self._create_bcrt_message(message, buffer_id)
         elif isinstance(message, types.RT_BC_Message):
-            hw_message = self._create_rtbc(message, buffer_id)
+            hw_message = self._create_rtbc_message(message, buffer_id)
         elif isinstance(message, types.RT_RT_Message):
-            hw_message = self._create_rtrt(message, buffer_id)
+            hw_message = self._create_rtrt_message(message, buffer_id)
         elif isinstance(message, types.MC_Message):
-            hw_message = self._create_mc(message, buffer_id)
+            hw_message = self._create_mc_message(message, buffer_id)
         else:
             raise TypeError(f'{message.name}, type "{type(message)}", should be of type Message')
 
         return (hw_message, self._create_message_buffer(buffer_id))
 
-    def _create_bcrt(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
+    def _create_bcrt_message(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
         bcrt = hw.MessageBcrt1553Type(
             message.terminal_address,
             message.sub_address,
@@ -300,7 +304,7 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
             message_buffer_idref=buffer_id,
         )
 
-    def _create_rtbc(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
+    def _create_rtbc_message(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
         rtbc = hw.MessageRtbc1553Type(
             message.terminal_address,
             message.sub_address,
@@ -313,7 +317,7 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
             message_buffer_idref=buffer_id,
         )
 
-    def _create_rtrt(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
+    def _create_rtrt_message(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
         rtrt = hw.MessageRtrt1553Type(
             message.terminal_address1,
             message.sub_address1,
@@ -329,7 +333,7 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
             message_buffer_idref=buffer_id,
         )
 
-    def _create_mc(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
+    def _create_mc_message(self, message: types.Message, buffer_id: int) -> hw.Message1553Type:
         mc_direction = (
             hw.ModeCode1553TypeDirection.RX
             if message.direction == types.MC_Direction.RX
@@ -391,7 +395,9 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         message_ids = [self._get_message_id(name, messages) for name in frame.schedule]
         message_refs = [hw.SchedMessageRef1553Type(id) for id in message_ids]
 
-        return hw.MinorFrame1553Type(message_refs, id=self._get_uid(), name=frame.name)
+        return hw.MinorFrame1553Type(
+            message_refs, id=self._get_uid(), name=frame.name, frame_time=frame.frame_time
+        )
 
     def _create_major_frames(self, frames: hw.MinorFrames1553Type) -> hw.MajorFrames1553Type:
         scheduled_frame = self.major_frames[0]  # VS only allows for one running major frame
@@ -413,6 +419,107 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
             frame_refs.append(hw.MinorFrameRef1553Type(filtered_frames[0].id))
 
         return frame_refs
+
+    def _create_remote_terminals_type(self) -> hw.RemoteTerminals1553Type:
+
+        # Gather list of terminal and sub address pairs from messages
+        message_terminals = [message.list_terminals() for message in self.messages]
+        terminals = set().union(*message_terminals)
+
+        remote_terminals = [self._create_remote_terminal(ta) for ta in terminals]
+
+        return hw.RemoteTerminals1553Type(remote_terminals)
+
+    def _create_remote_terminal(self, terminal_address: int) -> hw.RemoteTerminal1553Type:
+
+        message_buffers = []
+        sub_addresses = []
+        mode_codes = []
+
+        # Filter messages to only include ones with relevant terminal addresses
+        filtered_messages = list(
+            filter(lambda x: (terminal_address in x.list_terminals()), self.messages)
+        )
+
+        for message in filtered_messages:
+            if isinstance(message, types.MC_Message):
+                mode_code, buffer = self._create_rt_mode_code(message)
+                mode_codes.append(mode_code)
+                message_buffers.append(buffer)
+            else:
+                sub_address, buffer = self._create_sub_address(message, terminal_address)
+                sub_addresses.append(sub_address)
+                message_buffers.append(buffer)
+
+        return hw.RemoteTerminal1553Type(
+            hw.MessageBuffers1553Type(message_buffers),
+            sub_addresses,
+            mode_codes,
+            id=self._get_uid(),
+            name=f"RT{terminal_address}",
+            rt_address=terminal_address,
+        )
+
+    def _create_rt_mode_code(
+        self, message: types.MC_Message
+    ) -> Tuple[hw.ModeCode1553Type, hw.MessageBuffer1553Type]:
+
+        buffer_id = self._get_uid()
+        direction = (
+            hw.ModeCode1553TypeDirection.RX
+            if message.direction == types.MC_Direction.RX
+            else hw.ModeCode1553TypeDirection.TX
+        )
+
+        mode_code = hw.ModeCode1553Type(
+            self._get_uid(),
+            f"MC{message.mode_code}",
+            message_buffer_idref=buffer_id,
+            mode_code_number=message.mode_code,
+            direction=direction,
+        )
+
+        return (mode_code, self._create_message_buffer(buffer_id))
+
+    def _create_sub_address(
+        self, message: types.Message, terminal_address: int
+    ) -> Tuple[hw.SubAddress1553Type, hw.MessageBuffer1553Type]:
+        buffer_id = self._get_uid()
+        buffer = self._create_message_buffer(buffer_id)
+
+        if isinstance(message, types.BC_RT_Message):
+            sub_address = hw.SubAddress1553Type(
+                self._get_uid(),
+                f"SA{message.sub_address}",
+                message_buffer_idref=buffer_id,
+                sub_address=message.sub_address,
+                direction=hw.SubAddress1553TypeDirection.RX,
+            )
+        elif isinstance(message, types.RT_BC_Message):
+            sub_address = hw.SubAddress1553Type(
+                self._get_uid(),
+                f"SA{message.sub_address}",
+                message_buffer_idref=buffer_id,
+                sub_address=message.sub_address,
+                direction=hw.SubAddress1553TypeDirection.TX,
+            )
+        else:  # RTRT message
+            if message.terminal_address1 == terminal_address:
+                address = message.sub_address1
+                direction = hw.SubAddress1553TypeDirection.RX
+            else:
+                address = message.sub_address2
+                direction = hw.SubAddress1553TypeDirection.TX
+
+            sub_address = hw.SubAddress1553Type(
+                self._get_uid(),
+                f"SA{address}",
+                message_buffer_idref=buffer_id,
+                sub_address=address,
+                direction=direction,
+            )
+
+        return (sub_address, buffer)
 
 
 if __name__ == "__main__":

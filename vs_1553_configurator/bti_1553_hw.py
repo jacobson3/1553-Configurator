@@ -1576,15 +1576,15 @@ class ModeCode1553Type:
             "type": "Attribute",
         },
     )
-    data_wipe: Message1553GroupDataWipe = field(
-        default=Message1553GroupDataWipe.ZEROES,
+    data_wipe: Optional[Message1553GroupDataWipe] = field(
+        default=None,
         metadata={
             "name": "dataWipe",
             "type": "Attribute",
         },
     )
-    allow_error_injection: bool = field(
-        default=False,
+    allow_error_injection: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "allowErrorInjection",
             "type": "Attribute",
@@ -1597,35 +1597,35 @@ class ModeCode1553Type:
             "type": "Attribute",
         },
     )
-    event_log: bool = field(
-        default=False,
+    event_log: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLog",
             "type": "Attribute",
         },
     )
-    sync_output: bool = field(
-        default=False,
+    sync_output: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "syncOutput",
             "type": "Attribute",
         },
     )
-    monitor: bool = field(
-        default=False,
+    monitor: Optional[bool] = field(
+        default=None,
         metadata={
             "type": "Attribute",
         },
     )
-    time_or_hit_count: Message1553GroupTimeOrHitCount = field(
-        default=Message1553GroupTimeOrHitCount.TIME,
+    time_or_hit_count: Optional[Message1553GroupTimeOrHitCount] = field(
+        default=None,
         metadata={
             "name": "timeOrHitCount",
             "type": "Attribute",
         },
     )
-    elapse_min_or_max: Message1553GroupElapseMinOrMax = field(
-        default=Message1553GroupElapseMinOrMax.ELAPSETIME,
+    elapse_min_or_max: Optional[Message1553GroupElapseMinOrMax] = field(
+        default=None,
         metadata={
             "name": "elapseMinOrMax",
             "type": "Attribute",
@@ -1648,8 +1648,8 @@ class ModeCode1553Type:
             "required": True,
         },
     )
-    wrap: bool = field(
-        default=False,
+    wrap: Optional[bool] = field(
+        default=None,
         metadata={
             "type": "Attribute",
         },
@@ -1767,21 +1767,21 @@ class SubAddress1553Type:
             "white_space": "preserve",
         },
     )
-    enable: bool = field(
-        default=True,
+    enable: Optional[bool] = field(
+        default=None,
         metadata={
             "type": "Attribute",
         },
     )
-    data_wipe: Message1553GroupDataWipe = field(
-        default=Message1553GroupDataWipe.ZEROES,
+    data_wipe: Optional[Message1553GroupDataWipe] = field(
+        default=None,
         metadata={
             "name": "dataWipe",
             "type": "Attribute",
         },
     )
-    allow_error_injection: bool = field(
-        default=False,
+    allow_error_injection: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "allowErrorInjection",
             "type": "Attribute",
@@ -1794,35 +1794,35 @@ class SubAddress1553Type:
             "type": "Attribute",
         },
     )
-    event_log: bool = field(
-        default=False,
+    event_log: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "eventLog",
             "type": "Attribute",
         },
     )
-    sync_output: bool = field(
-        default=False,
+    sync_output: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "syncOutput",
             "type": "Attribute",
         },
     )
-    monitor: bool = field(
-        default=False,
+    monitor: Optional[bool] = field(
+        default=None,
         metadata={
             "type": "Attribute",
         },
     )
-    time_or_hit_count: Message1553GroupTimeOrHitCount = field(
-        default=Message1553GroupTimeOrHitCount.TIME,
+    time_or_hit_count: Optional[Message1553GroupTimeOrHitCount] = field(
+        default=None,
         metadata={
             "name": "timeOrHitCount",
             "type": "Attribute",
         },
     )
-    elapse_min_or_max: Message1553GroupElapseMinOrMax = field(
-        default=Message1553GroupElapseMinOrMax.ELAPSETIME,
+    elapse_min_or_max: Optional[Message1553GroupElapseMinOrMax] = field(
+        default=None,
         metadata={
             "name": "elapseMinOrMax",
             "type": "Attribute",
@@ -1845,8 +1845,8 @@ class SubAddress1553Type:
             "required": True,
         },
     )
-    wrap: bool = field(
-        default=False,
+    wrap: Optional[bool] = field(
+        default=None,
         metadata={
             "type": "Attribute",
         },
@@ -3033,8 +3033,8 @@ class Message1553Type:
             "type": "Attribute",
         },
     )
-    retry_count: Optional[int] = field(
-        default=None,
+    retry_count: int = field(
+        default=0,
         metadata={
             "name": "retryCount",
             "type": "Attribute",
@@ -3448,8 +3448,8 @@ class RemoteTerminal1553Type:
             "white_space": "preserve",
         },
     )
-    schema_version: SchemaVersionGroupSchemaVersion = field(
-        default=SchemaVersionGroupSchemaVersion.UNDEFINED,
+    schema_version: Optional[SchemaVersionGroupSchemaVersion] = field(
+        default=None,
         metadata={
             "name": "schemaVersion",
             "type": "Attribute",
@@ -3465,8 +3465,8 @@ class RemoteTerminal1553Type:
             "max_inclusive": 31,
         },
     )
-    rt_mode: RemoteTerminal1553TypeRtMode = field(
-        default=RemoteTerminal1553TypeRtMode.SIMULATE,
+    rt_mode: Optional[RemoteTerminal1553TypeRtMode] = field(
+        default=None,
         metadata={
             "name": "rtMode",
             "type": "Attribute",
@@ -3481,57 +3481,57 @@ class RemoteTerminal1553Type:
             "format": "base16",
         },
     )
-    no_build: bool = field(
-        default=False,
+    no_build: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "noBuild",
             "type": "Attribute",
         },
     )
-    auto_busy: bool = field(
-        default=False,
+    auto_busy: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "autoBusy",
             "type": "Attribute",
         },
     )
-    dynamic_bc: bool = field(
-        default=False,
+    dynamic_bc: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "dynamicBC",
             "type": "Attribute",
         },
     )
-    clear_swd_immediate: bool = field(
-        default=False,
+    clear_swd_immediate: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "clearSwdImmediate",
             "type": "Attribute",
         },
     )
-    bus_enable: RemoteTerminal1553TypeBusEnable = field(
-        default=RemoteTerminal1553TypeBusEnable.AB,
+    bus_enable: Optional[RemoteTerminal1553TypeBusEnable] = field(
+        default=None,
         metadata={
             "name": "busEnable",
             "type": "Attribute",
         },
     )
-    data_wipe: RemoteTerminal1553TypeDataWipe = field(
-        default=RemoteTerminal1553TypeDataWipe.ZEROES,
+    data_wipe: Optional[RemoteTerminal1553TypeDataWipe] = field(
+        default=None,
         metadata={
             "name": "dataWipe",
             "type": "Attribute",
         },
     )
-    sync_mode: RemoteTerminal1553TypeSyncMode = field(
-        default=RemoteTerminal1553TypeSyncMode.SELECTIVE,
+    sync_mode: Optional[RemoteTerminal1553TypeSyncMode] = field(
+        default=None,
         metadata={
             "name": "syncMode",
             "type": "Attribute",
         },
     )
-    response_mode: RemoteTerminal1553TypeResponseMode = field(
-        default=RemoteTerminal1553TypeResponseMode.VALUE_1553_B,
+    response_mode: Optional[RemoteTerminal1553TypeResponseMode] = field(
+        default=None,
         metadata={
             "name": "responseMode",
             "type": "Attribute",
@@ -3871,8 +3871,8 @@ class RemoteTerminals1553Type:
             "max_occurs": 32,
         },
     )
-    schema_version: SchemaVersionGroupSchemaVersion = field(
-        default=SchemaVersionGroupSchemaVersion.UNDEFINED,
+    schema_version: Optional[SchemaVersionGroupSchemaVersion] = field(
+        default=None,
         metadata={
             "name": "schemaVersion",
             "type": "Attribute",

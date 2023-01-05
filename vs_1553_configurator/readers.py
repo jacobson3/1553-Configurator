@@ -96,48 +96,54 @@ class Excel_1553_Reader(MIL_1553_Reader):
 
             # Create message and add it to list of messages
             if message_type == Excel_Message_Type.BCRT:
-                message_objects.append(self._create_bcrt_message(message_name, message_data))
+                message_objects.append(
+                    self._create_bcrt_message_message(message_name, message_data)
+                )
             elif message_type == Excel_Message_Type.RTBC:
-                message_objects.append(self._create_rtbc_message(message_name, message_data))
+                message_objects.append(
+                    self._create_rtbc_message_message(message_name, message_data)
+                )
             elif message_type == Excel_Message_Type.RTRT:
-                message_objects.append(self._create_rtrt_message(message_name, message_data))
+                message_objects.append(
+                    self._create_rtrt_message_message(message_name, message_data)
+                )
             elif message_type == Excel_Message_Type.MC:
-                message_objects.append(self._create_mc_message(message_name, message_data))
+                message_objects.append(self._create_mc_message_message(message_name, message_data))
             else:
                 raise TypeError(f"Unknown message type: {message_type}")
 
         self.messages = message_objects
 
-    def _create_bcrt_message(self, message_name: str, message_data: dict) -> types.Message:
-        terminal_address = message_data.get("terminalAddress1")
-        sub_address = message_data.get("subAddress1")
-        words = message_data.get("words")
+    def _create_bcrt_message_message(self, message_name: str, message_data: dict) -> types.Message:
+        terminal_address = int(message_data.get("terminalAddress1"))
+        sub_address = int(message_data.get("subAddress1"))
+        words = int(message_data.get("words"))
 
         return types.BC_RT_Message(message_name, terminal_address, sub_address, words)
 
-    def _create_rtbc_message(self, message_name: str, message_data: dict) -> types.Message:
-        terminal_address = message_data.get("terminalAddress1")
-        sub_address = message_data.get("subAddress1")
-        words = message_data.get("words")
+    def _create_rtbc_message_message(self, message_name: str, message_data: dict) -> types.Message:
+        terminal_address = int(message_data.get("terminalAddress1"))
+        sub_address = int(message_data.get("subAddress1"))
+        words = int(message_data.get("words"))
 
         return types.RT_BC_Message(message_name, terminal_address, sub_address, words)
 
-    def _create_rtrt_message(self, message_name: str, message_data: dict) -> types.Message:
-        terminal_address1 = message_data.get("terminalAddress1")
-        sub_address1 = message_data.get("subAddress1")
-        terminal_address2 = message_data.get("terminalAddress2")
-        sub_address2 = message_data.get("subAddress2")
-        words = message_data.get("words")
+    def _create_rtrt_message_message(self, message_name: str, message_data: dict) -> types.Message:
+        terminal_address1 = int(message_data.get("terminalAddress1"))
+        sub_address1 = int(message_data.get("subAddress1"))
+        terminal_address2 = int(message_data.get("terminalAddress2"))
+        sub_address2 = int(message_data.get("subAddress2"))
+        words = int(message_data.get("words"))
 
         return types.RT_RT_Message(
             message_name, terminal_address1, sub_address1, terminal_address2, sub_address2, words
         )
 
-    def _create_mc_message(self, message_name: str, message_data: dict) -> types.Message:
-        terminal_address = message_data.get("terminalAddress1")
-        sub_address = message_data.get("subAddress1")
-        words = message_data.get("words")
-        mode_code = message_data.get("MC")
+    def _create_mc_message_message(self, message_name: str, message_data: dict) -> types.Message:
+        terminal_address = int(message_data.get("terminalAddress1"))
+        sub_address = int(message_data.get("subAddress1"))
+        words = int(message_data.get("words"))
+        mode_code = int(message_data.get("MC"))
         direction = message_data.get("MCDirection")
 
         return types.MC_Message(

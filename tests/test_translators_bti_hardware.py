@@ -2,7 +2,7 @@ import vs_1553_configurator.types as types
 from vs_1553_configurator.translators import BTI_1553_HardwareTranslator
 
 
-def test_create_bcrt():
+def test_create_bcrt_message():
     message_name = "BC to RT1 (SA2)"
     terminal_address = 1
     sub_address = 2
@@ -20,7 +20,7 @@ def test_create_bcrt():
     assert hw_message.message_buffer_idref == hw_message_buffer.id
 
 
-def test_create_rtbc():
+def test_create_rtbc_message():
     message_name = "RT15 to BC"
     terminal_address = 15
     sub_address = 6
@@ -38,7 +38,7 @@ def test_create_rtbc():
     assert hw_message.message_buffer_idref == hw_message_buffer.id
 
 
-def test_create_rtrt():
+def test_create_rtrt_message():
     message_name = "RT1 to RT15"
     terminal_address1 = 15
     sub_address1 = 20
@@ -63,7 +63,7 @@ def test_create_rtrt():
     assert hw_message.message_buffer_idref == hw_message_buffer.id
 
 
-def test_create_mc():
+def test_create_mc_message():
     message_name = "MC 17"
     terminal_address = 1
     sub_address = 31
