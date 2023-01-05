@@ -1,16 +1,16 @@
 import vs_1553_configurator.types as types
-from vs_1553_configurator.translators import BTI_1553_Translator
+from vs_1553_configurator.translators import BTI_1553_ParameterTranslator
 
 
-def test_create_parameter_bcrt():
+def test_create_bcrt():
     message_name = "BC to RT1 (SA2)"
     terminal_address = 1
     sub_address = 2
     words = 4
 
     bcrt = types.BC_RT_Message(message_name, terminal_address, sub_address, words)
-    translator = BTI_1553_Translator([bcrt], [], [], [])
-    parameter_messages = translator._create_parameter_messages()
+    translator = BTI_1553_ParameterTranslator([bcrt], [], [], [])
+    parameter_messages = translator._create_messages()
     parameter_message = parameter_messages[0]
 
     assert parameter_message.name == message_name
@@ -23,15 +23,15 @@ def test_create_parameter_bcrt():
     assert parameter_message.address[0].terminal_address == terminal_address
 
 
-def test_create_parameter_rtbc():
+def test_create_rtbc():
     message_name = "RT15 to BC"
     terminal_address = 15
     sub_address = 6
     words = 4
 
     rtbc = types.RT_BC_Message(message_name, terminal_address, sub_address, words)
-    translator = BTI_1553_Translator([rtbc], [], [], [])
-    parameter_messages = translator._create_parameter_messages()
+    translator = BTI_1553_ParameterTranslator([rtbc], [], [], [])
+    parameter_messages = translator._create_messages()
     parameter_message = parameter_messages[0]
 
     assert parameter_message.name == message_name
@@ -44,7 +44,7 @@ def test_create_parameter_rtbc():
     assert parameter_message.address[0].terminal_address == terminal_address
 
 
-def test_create_parameter_rtrt():
+def test_create_rtrt():
     message_name = "RT1 to RT15"
     terminal_address1 = 15
     sub_address1 = 20
@@ -55,8 +55,8 @@ def test_create_parameter_rtrt():
     rtrt = types.RT_RT_Message(
         message_name, terminal_address1, sub_address1, terminal_address2, sub_address2, words
     )
-    translator = BTI_1553_Translator([rtrt], [], [], [])
-    parameter_messages = translator._create_parameter_messages()
+    translator = BTI_1553_ParameterTranslator([rtrt], [], [], [])
+    parameter_messages = translator._create_messages()
     parameter_message = parameter_messages[0]
 
     assert parameter_message.name == message_name
@@ -72,7 +72,7 @@ def test_create_parameter_rtrt():
     assert parameter_message.address[1].terminal_address == terminal_address2
 
 
-def test_create_parameter_mc():
+def test_create_mc():
     message_name = "MC 17"
     terminal_address = 1
     sub_address = 31
@@ -81,8 +81,8 @@ def test_create_parameter_mc():
     direction = types.MC_Direction.RX
 
     mc = types.MC_Message(message_name, terminal_address, sub_address, words, mode_code, direction)
-    translator = BTI_1553_Translator([mc], [], [], [])
-    parameter_messages = translator._create_parameter_messages()
+    translator = BTI_1553_ParameterTranslator([mc], [], [], [])
+    parameter_messages = translator._create_messages()
     parameter_message = parameter_messages[0]
 
     assert parameter_message.name == message_name
@@ -96,15 +96,15 @@ def test_create_parameter_mc():
     assert parameter_message.address[0].terminal_address == terminal_address
 
 
-def test_create_parameter_terminals():
+def test_create_terminals():
     message_name = "RT15 to BC"
     terminal_addresses = [0, 1, 15, 21]
     sa = 6
     words = 4
 
     messages = [types.BC_RT_Message(message_name, ta, sa, words) for ta in terminal_addresses]
-    translator = BTI_1553_Translator(messages, [], [], [])
-    terminals = translator._create_parameter_terminals()
+    translator = BTI_1553_ParameterTranslator(messages, [], [], [])
+    terminals = translator._create_terminals()
 
     terminals_created = [x.terminal_address for x in terminals.terminal]
 
