@@ -442,14 +442,15 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         )
 
         for message in filtered_messages:
+            buffer_id = self._get_uid()
+            message_buffers.append(self._create_message_buffer(buffer_id))
+
             if isinstance(message, types.MC_Message):
-                mode_code, buffer = self._create_rt_mode_code(message)
+                mode_code = self._create_rt_mode_code(message, buffer_id)
                 mode_codes.append(mode_code)
-                message_buffers.append(buffer)
             else:
-                sub_address, buffer = self._create_sub_address(message, terminal_address)
+                sub_address = self._create_sub_address(message, terminal_address, buffer_id)
                 sub_addresses.append(sub_address)
-                message_buffers.append(buffer)
 
         return hw.RemoteTerminal1553Type(
             hw.MessageBuffers1553Type(message_buffers),
@@ -461,10 +462,8 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         )
 
     def _create_rt_mode_code(
-        self, message: types.MC_Message
-    ) -> Tuple[hw.ModeCode1553Type, hw.MessageBuffer1553Type]:
-
-        buffer_id = self._get_uid()
+        self, message: types.MC_Message, buffer_id: int
+    ) -> hw.ModeCode1553Type:
         direction = (
             hw.ModeCode1553TypeDirection.RX
             if message.direction == types.MC_Direction.RX
@@ -479,13 +478,11 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
             direction=direction,
         )
 
-        return (mode_code, self._create_message_buffer(buffer_id))
+        return mode_code
 
     def _create_sub_address(
-        self, message: types.Message, terminal_address: int
-    ) -> Tuple[hw.SubAddress1553Type, hw.MessageBuffer1553Type]:
-        buffer_id = self._get_uid()
-        buffer = self._create_message_buffer(buffer_id)
+        self, message: types.Message, terminal_address: int, buffer_id: int
+    ) -> hw.SubAddress1553Type:
 
         if isinstance(message, types.BC_RT_Message):
             sub_address = hw.SubAddress1553Type(
@@ -519,7 +516,7 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
                 direction=direction,
             )
 
-        return (sub_address, buffer)
+        return sub_address
 
 
 if __name__ == "__main__":
