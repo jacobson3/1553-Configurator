@@ -4,6 +4,10 @@ from typing import List
 
 
 class MC_Direction(Enum):
+    """
+    Mode code message direction enum
+    """
+
     RX = "Rx"
     TX = "Tx"
 
@@ -20,7 +24,7 @@ class Message(ABC):
     @property
     def name(self) -> str:
         """
-        Message name
+        Message name, each message must have a unique name
         """
         return self._name
 
@@ -219,7 +223,7 @@ class RT_RT_Message(Message):
     @property
     def words(self) -> int:
         """
-        The number of data words to expect represented in 5 bits in the command word 1
+        The number of data words to expect represented in 5 bits in the command word 1 and 2
         """
         return self._words
 
@@ -301,7 +305,7 @@ class MC_Message(Message):
     @property
     def direction(self) -> MC_Direction:
         """
-        Mode code direction
+        Mode code direction (Rx | Tx)
         """
         return self._direction
 
@@ -326,7 +330,7 @@ class Frame(ABC):
     @property
     def name(self) -> str:
         """
-        Frame name
+        Frame name, each frame must have a unique name
         """
         return self._name
 

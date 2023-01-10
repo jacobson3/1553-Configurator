@@ -6,6 +6,10 @@ import vs_1553_configurator.types as types
 
 
 class MIL_1553_Reader(ABC):
+    """
+    Abstract class responsible for generating MIL-STD-1553 data object from input configuration file
+    """
+
     def __init__(self, config_path: str):
         self.config = types.MIL_STD_1553_Config()
         self.load_configuration(config_path)
@@ -30,6 +34,10 @@ class MIL_1553_Reader(ABC):
 
 
 class Excel_Message_Type(str, Enum):
+    """
+    1553 message type enum
+    """
+
     BCRT = "BC-RT"
     RTBC = "RT-BC"
     RTRT = "RT-RT"
@@ -37,12 +45,17 @@ class Excel_Message_Type(str, Enum):
 
 
 class Excel_1553_Reader(MIL_1553_Reader):
+    """
+    Generates MIL-STD-1553 configuration object from valid Excel configuration file
+    """
+
     def __init__(self, config_path: str):
         super().__init__(config_path)
 
     def load_configuration(self, path: str):
         workbook = pandas.read_excel(path, [0, 1, 2])
 
+        # messages must be loaded before frames as minor/acyclic frames reference messages
         self._sheet_to_messages(workbook[0])
         self._sheet_to_frames(workbook[2])
 
@@ -54,6 +67,7 @@ class Excel_1553_Reader(MIL_1553_Reader):
 
         message_objects = []
         # Iterate through rows in Excel configuration
+        # Message data is dictionary with column headers as keys and row data as values
         for message_name in messages:
             message_type = messages[message_name].get("messageType")
             message_data = messages[message_name]
@@ -120,20 +134,26 @@ class Excel_1553_Reader(MIL_1553_Reader):
         """
         frames_list = sheet.to_dict()
 
+        # For each column in Frames sheet
         for frame_name in frames_list:
             frame_time = frames_list.get(frame_name).get(0)
             schedule = self._get_schedule(frames_list.get(frame_name))
 
-            if pandas.isnull(frame_time):
+            if pandas.isnull(frame_time):  # No frame time == MajorFrame
                 self.config.major_frames.append(self._create_major_frame(frame_name, schedule))
-            elif frame_time == -1:
+            elif frame_time == -1:  # Frame time -1 == AcyclicFrame
                 self.config.acyclic_frames.append(self._create_acyclic_frame(frame_name, schedule))
-            else:
+            elif frame_time > 0:  # Positive frame time == MinorFrame
                 self.config.minor_frames.append(
                     self._create_minor_frame(frame_name, schedule, frame_time)
                 )
+            else:
+                raise ValueError(f"Recieved frame time of {frame_time}, expected int > 0")
 
     def _get_schedule(self, frame_dict: dict) -> List[str]:
+        """
+        Returns column as string list, ignoring empty cells
+        """
         return [
             frame_dict.get(i)
             for i in range(1, len(frame_dict))

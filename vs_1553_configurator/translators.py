@@ -11,6 +11,10 @@ import vs_1553_configurator.bti_1553_hw as hw
 
 
 class MIL_1553_Translator(ABC):
+    """
+    Abstract class responsible for transforming data objects into config files
+    """
+
     def __init__(self, configuration: types.MIL_STD_1553_Config):
         self.messages = configuration.messages
         self.major_frames = configuration.major_frames
@@ -19,6 +23,9 @@ class MIL_1553_Translator(ABC):
 
     @property
     def messages(self) -> List[types.Message]:
+        """
+        List of 1553 messages (BCRT | RTBC | RTRT | MC)
+        """
         return self._messages
 
     @messages.setter
@@ -27,6 +34,9 @@ class MIL_1553_Translator(ABC):
 
     @property
     def major_frames(self) -> List[types.MajorFrame]:
+        """ "
+        List of major frames, each major frame containts a list of minor frames to be executed
+        """
         return self._major_frames
 
     @major_frames.setter
@@ -35,6 +45,10 @@ class MIL_1553_Translator(ABC):
 
     @property
     def minor_frames(self) -> List[types.MinorFrame]:
+        """
+        List of minor frames, each minor frame contains a list of messages
+        to be executed periodically
+        """
         return self._minor_frames
 
     @minor_frames.setter
@@ -43,6 +57,9 @@ class MIL_1553_Translator(ABC):
 
     @property
     def acyclic_frames(self) -> List[types.AcyclicFrame]:
+        """
+        List of acyclic frames, each acyclic frame contains a list of messages to be executed
+        """
         return self._acyclic_frames
 
     @acyclic_frames.setter
@@ -51,12 +68,19 @@ class MIL_1553_Translator(ABC):
 
 
 class BTI_1553_ParameterTranslator(MIL_1553_Translator):
+    """
+    Generates parameter XML file from config data used by VeriStand to control BTI 1553 hardware
+    """
+
     def __init__(self, config: types.MIL_STD_1553_Config):
         super().__init__(config)
         self.id = -1
 
     @property
     def id(self) -> int:
+        """
+        Counter used to generate incrementing unique ids
+        """
         return self._id
 
     @id.setter
@@ -84,6 +108,11 @@ class BTI_1553_ParameterTranslator(MIL_1553_Translator):
         return [self._create_message(message) for message in self.messages]
 
     def _create_message(self, message: types.Message) -> Parameters.Channel.Message:
+        """
+        Returns BTI specific message object generated from input message data object
+        """
+
+        # Create message of specific type depending on incoming mesage type
         if isinstance(message, types.BC_RT_Message):
             return self._create_bcrt_message(message)
 
@@ -158,7 +187,12 @@ class BTI_1553_ParameterTranslator(MIL_1553_Translator):
         return parameter_message
 
     def _create_terminals(self) -> Parameters.Channel.Terminals:
-        terminal_set = set([0])  # Start with BC for now
+        """
+        Create terminal data objects to be flattened to XML
+        """
+        terminal_set = set([0])  # Always include BC
+
+        # Add any terminal address to set if it is referenced in a message
         for message in self.messages:
             terminal_set.update(message.list_terminals())
 
@@ -168,16 +202,26 @@ class BTI_1553_ParameterTranslator(MIL_1553_Translator):
         return Parameters.Channel.Terminals(terminals)
 
     def _create_acyclic_frames(self) -> List[Parameters.Channel.AcyclicFrame]:
+        """
+        Create acyclic frame data objects to be flattened to XML
+        """
         return [Parameters.Channel.AcyclicFrame(name=frame.name) for frame in self.acyclic_frames]
 
 
 class BTI_1553_HardwareTranslator(MIL_1553_Translator):
+    """
+    Generates hardware XML file from config data used by VeriStand to control BTI 1553 hardware
+    """
+
     def __init__(self, config: types.MIL_STD_1553_Config):
         super().__init__(config)
         self.id = -1
 
     @property
     def id(self) -> int:
+        """
+        Counter used to generate incrementing unique ids
+        """
         return self._id
 
     @id.setter
@@ -188,9 +232,12 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         """
         Returns XML string representing the VeriStand hardware XML for BTI 1553 hardware
         """
+
+        # Create Bus Controller and all Remote Terminals
         bus_controller = self._create_bus_controller()
         remote_terminals = self._create_remote_terminals_type()
 
+        # Wrap up 1553 BC and RTs into BTI hardware objects
         simulation_1553 = hw.Simulation1553Type(
             bus_controller=bus_controller, remote_terminals=remote_terminals
         )
@@ -206,8 +253,8 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
             schema_version=hw.SchemaVersionGroupSchemaVersion.VALUE_1_1,
         )
 
+        # Generates and returns XML string from previously created data objects
         serializer = XmlSerializer()
-
         return serializer.render(core, {"bti": hw.__NAMESPACE__})
 
     def _get_uid(self) -> int:
@@ -218,6 +265,9 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         return self.id
 
     def _create_bus_controller(self) -> hw.BusController1553Type:
+        """
+        Returns data object representing the Bus Controller defined by this class's data
+        """
         id = self._get_uid()
 
         messages, message_buffers = self._create_messages()
@@ -232,21 +282,28 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
             major_frames,
             acyclic_frames,
             id=id,
-            schedule_idref=major_frames.major_frame[0].id,
+            schedule_idref=major_frames.major_frame[0].id,  # VeriStand can only use 1 major frame
         )
 
     def _create_messages(
         self,
     ) -> Tuple[hw.Messages1553Type, hw.MessageBuffers1553Type]:
+        """
+        Returns both message and message buffer objects.
+        Each message has a corresponding message buffer.
+        """
+
         messages = []
         message_buffers = []
 
         # For each message generate bti message and buffer, add to respective list
         for message in self.messages:
             hw_message, hw_message_buffer = self._create_message(message)
+
             messages.append(hw_message)
             message_buffers.append(hw_message_buffer)
 
+        # Wrap lists into BTI specific list objects
         hw_messages = hw.Messages1553Type(messages)
         hw_message_buffers = hw.MessageBuffers1553Type(message_buffers)
 
@@ -260,6 +317,7 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         """
         buffer_id = self._get_uid()
 
+        # Function called depends on incoming message type
         if isinstance(message, types.BC_RT_Message):
             hw_message = self._create_bcrt_message(message, buffer_id)
         elif isinstance(message, types.RT_BC_Message):
@@ -353,14 +411,23 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         messages: hw.Messages1553Type,
     ) -> hw.AcyclicFrame1553Type:
 
+        # Convert list of message names into list of corresponding message ids
         message_ids = [self._get_message_id(name, messages) for name in frame.schedule]
+
         message_refs = [hw.SchedMessageRef1553Type(id) for id in message_ids]
 
         return hw.AcyclicFrame1553Type(message_refs, id=self._get_uid(), name=frame.name)
 
     def _get_message_id(self, name: str, messages: hw.Messages1553Type) -> int:
+        """
+        Returns ID of the message with name matching the name input parameter
+        """
         filtered_messages = list(filter(lambda x: (x.name == name), messages.message_command))
-        return filtered_messages[0].id
+
+        if filtered_messages[0] is None:
+            raise BaseException(f'Frame references message with name "{name}" which was not found')
+        else:
+            return filtered_messages[0].id
 
     def _create_minor_frames(self, messages: hw.Messages1553Type) -> hw.MinorFrames1553Type:
 
@@ -374,7 +441,9 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         messages: hw.Messages1553Type,
     ) -> hw.MinorFrame1553Type:
 
+        # Convert list of message names into list of corresponding message ids
         message_ids = [self._get_message_id(name, messages) for name in frame.schedule]
+
         message_refs = [hw.SchedMessageRef1553Type(id) for id in message_ids]
 
         return hw.MinorFrame1553Type(
@@ -398,13 +467,19 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
 
         for name in schedule:
             filtered_frames = list(filter(lambda x: (x.name == name), frames.minor_frame))
-            frame_refs.append(hw.MinorFrameRef1553Type(filtered_frames[0].id))
+
+            if filtered_frames[0] is None:
+                raise BaseException(
+                    f'Frame references message with name "{name}" which was not found'
+                )
+            else:
+                frame_refs.append(hw.MinorFrameRef1553Type(filtered_frames[0].id))
 
         return frame_refs
 
     def _create_remote_terminals_type(self) -> hw.RemoteTerminals1553Type:
 
-        # Gather list of terminal and sub address pairs from messages
+        # Gather set of all terminal addresses referenced in messages
         message_terminals = [message.list_terminals() for message in self.messages]
         terminals = set().union(*message_terminals)
 
@@ -423,6 +498,7 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
             filter(lambda x: (terminal_address in x.list_terminals()), self.messages)
         )
 
+        # Create messages with MC message being separated from BCRT, RTBC, and RTRT messages
         for message in filtered_messages:
             buffer_id = self._get_uid()
             message_buffers.append(self._create_message_buffer(buffer_id))
