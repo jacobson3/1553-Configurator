@@ -395,3 +395,59 @@ class MinorFrame(Frame):
     @frame_time.setter
     def frame_time(self, frame_time: int):
         self._frame_time = frame_time
+
+
+class MIL_STD_1553_Config:
+    """
+    Data object representing all information necessary to define a MIL-STD-1553 bus
+    """
+
+    def __init__(self):
+        self.messages = []
+        self.minor_frames = []
+        self.major_frames = []
+        self.acyclic_frames = []
+
+    @property
+    def messages(self) -> List[Message]:
+        """
+        Messages communicated over a MIL-STD-1553 bus
+        """
+        return self._messages
+
+    @messages.setter
+    def messages(self, messages: List[Message]):
+        self._messages = messages
+
+    @property
+    def minor_frames(self) -> List[MinorFrame]:
+        """
+        A list of minor frames with each minor frame being a list of messages to be scheduled
+        """
+        return self._minor_frames
+
+    @minor_frames.setter
+    def minor_frames(self, frames: List[MinorFrame]):
+        self._minor_frames = frames
+
+    @property
+    def major_frames(self) -> List[MajorFrame]:
+        """
+        A list of major frames with each major frame being a schedule of several minor frames
+        """
+        return self._major_frames
+
+    @major_frames.setter
+    def major_frames(self, frames: List[MajorFrame]):
+        self._major_frames = frames
+
+    @property
+    def acyclic_frames(self) -> List[AcyclicFrame]:
+        """
+        A list of acyclic frames with each frame being a list of messages to be sent when specified
+        """
+        return self._acyclic_frames
+
+    @acyclic_frames.setter
+    def acyclic_frames(self, frames: List[AcyclicFrame]):
+        self._acyclic_frames = frames

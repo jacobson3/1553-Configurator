@@ -7,55 +7,19 @@ import vs_1553_configurator.types as types
 
 class MIL_1553_Reader(ABC):
     def __init__(self, config_path: str):
-        self.messages = []
-        self.major_frames = []
-        self.minor_frames = []
-        self.acyclic_frames = []
+        self.config = types.MIL_STD_1553_Config()
         self.load_configuration(config_path)
 
     @property
-    def messages(self) -> List[types.Message]:
+    def config(self) -> types.MIL_STD_1553_Config:
         """
-        Defines 1553 message (BC-RT | RT-BC | RT-RT | MC)
+        Data object representing all information necessary to define a MIL-STD-1553 bus
         """
-        return self._messages
+        return self._config
 
-    @messages.setter
-    def messages(self, messages: List[types.Message]):
-        self._messages = messages
-
-    @property
-    def major_frames(self) -> List[types.MajorFrame]:
-        """
-        Specifies a schedule that can be referenced by the channel for execution
-        """
-        return self._major_frames
-
-    @major_frames.setter
-    def major_frames(self, frames: List[types.MajorFrame]):
-        self._major_frames = frames
-
-    @property
-    def minor_frames(self) -> List[types.MinorFrame]:
-        """
-        A schedule of commands and messages that can be referenced in a majorFrame
-        """
-        return self._minor_frames
-
-    @minor_frames.setter
-    def minor_frames(self, frames: List[types.MinorFrame]):
-        self._minor_frames = frames
-
-    @property
-    def acyclic_frames(self) -> List[types.AcyclicFrame]:
-        """
-        A schedule of commands and messages that can be transmitted on-demand
-        """
-        return self._acyclic_frames
-
-    @acyclic_frames.setter
-    def acyclic_frames(self, frames: List[types.AcyclicFrame]):
-        self._acyclic_frames = frames
+    @config.setter
+    def config(self, config: types.MIL_STD_1553_Config):
+        self._config = config
 
     @abstractmethod
     def load_configuration(self, path: str):
@@ -112,7 +76,7 @@ class Excel_1553_Reader(MIL_1553_Reader):
             else:
                 raise TypeError(f"Unknown message type: {message_type}")
 
-        self.messages = message_objects
+        self.config.messages = message_objects
 
     def _create_bcrt_message_message(self, message_name: str, message_data: dict) -> types.Message:
         terminal_address = int(message_data.get("terminalAddress1"))
@@ -161,11 +125,13 @@ class Excel_1553_Reader(MIL_1553_Reader):
             schedule = self._get_schedule(frames_list.get(frame_name))
 
             if pandas.isnull(frame_time):
-                self.major_frames.append(self._create_major_frame(frame_name, schedule))
+                self.config.major_frames.append(self._create_major_frame(frame_name, schedule))
             elif frame_time == -1:
-                self.acyclic_frames.append(self._create_acyclic_frame(frame_name, schedule))
+                self.config.acyclic_frames.append(self._create_acyclic_frame(frame_name, schedule))
             else:
-                self.minor_frames.append(self._create_minor_frame(frame_name, schedule, frame_time))
+                self.config.minor_frames.append(
+                    self._create_minor_frame(frame_name, schedule, frame_time)
+                )
 
     def _get_schedule(self, frame_dict: dict) -> List[str]:
         return [

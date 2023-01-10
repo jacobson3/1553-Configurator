@@ -11,17 +11,11 @@ import vs_1553_configurator.bti_1553_hw as hw
 
 
 class MIL_1553_Translator(ABC):
-    def __init__(
-        self,
-        messages: List[types.Message],
-        major_frames: List[types.MajorFrame],
-        minor_frames: List[types.MinorFrame],
-        acyclic_frames: List[types.AcyclicFrame],
-    ):
-        self.messages = messages
-        self.major_frames = major_frames
-        self.minor_frames = minor_frames
-        self.acyclic_frames = acyclic_frames
+    def __init__(self, configuration: types.MIL_STD_1553_Config):
+        self.messages = configuration.messages
+        self.major_frames = configuration.major_frames
+        self.minor_frames = configuration.minor_frames
+        self.acyclic_frames = configuration.acyclic_frames
 
     @property
     def messages(self) -> List[types.Message]:
@@ -57,14 +51,8 @@ class MIL_1553_Translator(ABC):
 
 
 class BTI_1553_ParameterTranslator(MIL_1553_Translator):
-    def __init__(
-        self,
-        messages: List[types.Message],
-        major_frames: List[types.MajorFrame],
-        minor_frames: List[types.MinorFrame],
-        acyclic_frames: List[types.AcyclicFrame],
-    ):
-        super().__init__(messages, major_frames, minor_frames, acyclic_frames)
+    def __init__(self, config: types.MIL_STD_1553_Config):
+        super().__init__(config)
         self.id = -1
 
     @property
@@ -184,14 +172,8 @@ class BTI_1553_ParameterTranslator(MIL_1553_Translator):
 
 
 class BTI_1553_HardwareTranslator(MIL_1553_Translator):
-    def __init__(
-        self,
-        messages: List[types.Message],
-        major_frames: List[types.MajorFrame],
-        minor_frames: List[types.MinorFrame],
-        acyclic_frames: List[types.AcyclicFrame],
-    ):
-        super().__init__(messages, major_frames, minor_frames, acyclic_frames)
+    def __init__(self, config: types.MIL_STD_1553_Config):
+        super().__init__(config)
         self.id = -1
 
     @property
@@ -523,7 +505,6 @@ if __name__ == "__main__":
     from vs_1553_configurator.readers import Excel_1553_Reader
     import os
     import sys
-
     import xml.dom.minidom
 
     # Get path to config file
@@ -535,25 +516,17 @@ if __name__ == "__main__":
     reader = Excel_1553_Reader(config_path)
 
     # Translate configs
-    parameter_translator = BTI_1553_ParameterTranslator(
-        reader.messages,
-        reader.major_frames,
-        reader.minor_frames,
-        reader.acyclic_frames,
-    )
+    parameter_translator = BTI_1553_ParameterTranslator(reader.config)
     parameters_xml = parameter_translator.generate_parameters_xml()
 
-    hw_translator = BTI_1553_HardwareTranslator(
-        reader.messages,
-        reader.major_frames,
-        reader.minor_frames,
-        reader.acyclic_frames,
-    )
+    hw_translator = BTI_1553_HardwareTranslator(reader.config)
     hw_xml = hw_translator.generate_hw_xml()
 
     # Pretty print
-    # dom_parameters = xml.dom.minidom.parseString(parameters_xml)
-    # sys.stdout.write(dom_parameters.toprettyxml())
+    dom_parameters = xml.dom.minidom.parseString(parameters_xml)
+    sys.stdout.write(dom_parameters.toprettyxml())
+
+    print("")
 
     dom_hw = xml.dom.minidom.parseString(hw_xml)
     sys.stdout.write(dom_hw.toprettyxml())
