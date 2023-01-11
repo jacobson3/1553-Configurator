@@ -9,7 +9,9 @@ def test_create_bcrt_message():
     words = 4
 
     bcrt = types.BC_RT_Message(message_name, terminal_address, sub_address, words)
-    translator = BTI_1553_HardwareTranslator([bcrt], [], [], [])
+    config = types.MIL_STD_1553_Config()
+    config.messages = [bcrt]
+    translator = BTI_1553_HardwareTranslator(config)
     hw_message, hw_message_buffer = translator._create_message(bcrt)
 
     assert hw_message.name == message_name
@@ -27,7 +29,9 @@ def test_create_rtbc_message():
     words = 4
 
     rtbc = types.RT_BC_Message(message_name, terminal_address, sub_address, words)
-    translator = BTI_1553_HardwareTranslator([rtbc], [], [], [])
+    config = types.MIL_STD_1553_Config()
+    config.messages = [rtbc]
+    translator = BTI_1553_HardwareTranslator(config)
     hw_message, hw_message_buffer = translator._create_message(rtbc)
 
     assert hw_message.name == message_name
@@ -49,7 +53,9 @@ def test_create_rtrt_message():
     rtrt = types.RT_RT_Message(
         message_name, terminal_address1, sub_address1, terminal_address2, sub_address2, words
     )
-    translator = BTI_1553_HardwareTranslator([rtrt], [], [], [])
+    config = types.MIL_STD_1553_Config()
+    config.messages = [rtrt]
+    translator = BTI_1553_HardwareTranslator(config)
     hw_message, hw_message_buffer = translator._create_message(rtrt)
 
     assert hw_message.name == message_name
@@ -72,7 +78,9 @@ def test_create_mc_message():
     direction = types.MC_Direction.RX
 
     mc = types.MC_Message(message_name, terminal_address, sub_address, words, mode_code, direction)
-    translator = BTI_1553_HardwareTranslator([mc], [], [], [])
+    config = types.MIL_STD_1553_Config()
+    config.messages = [mc]
+    translator = BTI_1553_HardwareTranslator(config)
     hw_message, hw_message_buffer = translator._create_message(mc)
 
     assert hw_message.name == message_name
@@ -82,3 +90,94 @@ def test_create_mc_message():
     assert hw_message.message_mc.ta_val1 == terminal_address
 
     assert hw_message.message_buffer_idref == hw_message_buffer.id
+
+
+def test_create_acyclic_frames():
+    message_names = ["message1", "message2", "message3", "message4"]
+    terminal_addresses = [0, 1, 15, 21]
+    merged = tuple(zip(message_names, terminal_addresses))
+    frame_name = "testFrame"
+    schedule = message_names.copy()
+    schedule.reverse()
+
+    config = types.MIL_STD_1553_Config()
+
+    config.messages = [types.BC_RT_Message(name, ta, 4, 4) for name, ta in merged]
+    config.acyclic_frames = [types.AcyclicFrame(frame_name, schedule)]
+
+    translator = BTI_1553_HardwareTranslator(config)
+    messages, _ = translator._create_messages()
+    acyclic_frames = translator._create_acyclic_frames(messages)
+
+    messages.message_command
+
+    test_frame = acyclic_frames.acyclic_frame[0]
+
+    assert test_frame.name == frame_name
+
+    message_ids = [x.id for x in messages.message_command]
+
+    for ref in test_frame.command_message_ref:
+        assert ref.message_idref in message_ids
+
+
+def test_create_minor_frames():
+    message_names = ["message1", "message2", "message3", "message4"]
+    terminal_addresses = [0, 1, 15, 21]
+    merged = tuple(zip(message_names, terminal_addresses))
+    frame_name = "testFrame"
+    frame_time = 100
+    schedule = message_names.copy()
+    schedule.reverse()
+
+    config = types.MIL_STD_1553_Config()
+
+    config.messages = [types.BC_RT_Message(name, ta, 4, 4) for name, ta in merged]
+    config.minor_frames = [types.MinorFrame(frame_name, schedule, frame_time)]
+
+    translator = BTI_1553_HardwareTranslator(config)
+    messages, _ = translator._create_messages()
+    minor_frames = translator._create_minor_frames(messages)
+
+    test_frame = minor_frames.minor_frame[0]
+
+    assert test_frame.name == frame_name
+    assert test_frame.frame_time == frame_time
+
+    message_ids = [x.id for x in messages.message_command]
+
+    for ref in test_frame.command_message_ref:
+        assert ref.message_idref in message_ids
+
+
+def test_create_major_frames():
+    message_names = ["message1", "message2", "message3", "message4"]
+    terminal_addresses = [0, 1, 15, 21]
+    merged = tuple(zip(message_names, terminal_addresses))
+    frame_names = ["Frame1", "Frame2", "Frame3"]
+    frame_time = 100
+    major_name = "MajorFrame1"
+    schedule = message_names.copy()
+    schedule.reverse()
+
+    config = types.MIL_STD_1553_Config()
+
+    config.messages = [types.BC_RT_Message(name, ta, 4, 4) for name, ta in merged]
+    config.minor_frames = [types.MinorFrame(name, schedule, frame_time) for name in frame_names]
+    config.major_frames = [types.MajorFrame(major_name, frame_names)]
+
+    translator = BTI_1553_HardwareTranslator(config)
+    messages, _ = translator._create_messages()
+    minor_frames = translator._create_minor_frames(messages)
+    major_frames = translator._create_major_frames(minor_frames)
+
+    test_frame = major_frames.major_frame[0]
+
+    frame_ids = [x.id for x in minor_frames.minor_frame]
+
+    for ref in test_frame.minor_frame_ref:
+        assert ref.minor_frame_idref in frame_ids
+
+
+if __name__ == "__main__":
+    test_create_acyclic_frames()

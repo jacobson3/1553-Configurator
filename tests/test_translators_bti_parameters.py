@@ -9,7 +9,9 @@ def test_create_bcrt_message():
     words = 4
 
     bcrt = types.BC_RT_Message(message_name, terminal_address, sub_address, words)
-    translator = BTI_1553_ParameterTranslator([bcrt], [], [], [])
+    config = types.MIL_STD_1553_Config()
+    config.messages = [bcrt]
+    translator = BTI_1553_ParameterTranslator(config)
     parameter_messages = translator._create_messages()
     parameter_message = parameter_messages[0]
 
@@ -30,7 +32,9 @@ def test_create_rtbc_message():
     words = 4
 
     rtbc = types.RT_BC_Message(message_name, terminal_address, sub_address, words)
-    translator = BTI_1553_ParameterTranslator([rtbc], [], [], [])
+    config = types.MIL_STD_1553_Config()
+    config.messages = [rtbc]
+    translator = BTI_1553_ParameterTranslator(config)
     parameter_messages = translator._create_messages()
     parameter_message = parameter_messages[0]
 
@@ -55,7 +59,9 @@ def test_create_rtrt_message():
     rtrt = types.RT_RT_Message(
         message_name, terminal_address1, sub_address1, terminal_address2, sub_address2, words
     )
-    translator = BTI_1553_ParameterTranslator([rtrt], [], [], [])
+    config = types.MIL_STD_1553_Config()
+    config.messages = [rtrt]
+    translator = BTI_1553_ParameterTranslator(config)
     parameter_messages = translator._create_messages()
     parameter_message = parameter_messages[0]
 
@@ -81,7 +87,9 @@ def test_create_mc_message():
     direction = types.MC_Direction.RX
 
     mc = types.MC_Message(message_name, terminal_address, sub_address, words, mode_code, direction)
-    translator = BTI_1553_ParameterTranslator([mc], [], [], [])
+    config = types.MIL_STD_1553_Config()
+    config.messages = [mc]
+    translator = BTI_1553_ParameterTranslator(config)
     parameter_messages = translator._create_messages()
     parameter_message = parameter_messages[0]
 
@@ -102,10 +110,27 @@ def test_create_terminals():
     sa = 6
     words = 4
 
-    messages = [types.BC_RT_Message(message_name, ta, sa, words) for ta in terminal_addresses]
-    translator = BTI_1553_ParameterTranslator(messages, [], [], [])
+    config = types.MIL_STD_1553_Config()
+    config.messages = [
+        types.BC_RT_Message(message_name, ta, sa, words) for ta in terminal_addresses
+    ]
+    translator = BTI_1553_ParameterTranslator(config)
     terminals = translator._create_terminals()
 
     terminals_created = [x.terminal_address for x in terminals.terminal]
 
     assert terminals_created.sort() == terminal_addresses.sort()
+
+
+def test_create_acyclic_frames():
+    schedule = ["message1", "message2", "message3", "message4"]
+    frame_name = "testFrame"
+
+    config = types.MIL_STD_1553_Config()
+    config.acyclic_frames = [types.AcyclicFrame(frame_name, schedule)]
+
+    translator = BTI_1553_ParameterTranslator(config)
+    acyclic_frames = translator._create_acyclic_frames()
+
+    assert acyclic_frames[0].name == frame_name
+    assert acyclic_frames[0].create_trigger_channel is True
