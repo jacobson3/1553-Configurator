@@ -1,0 +1,41 @@
+@startuml
+package "1553 Types" {
+    [MIL_STD_1553_Config]
+    [Message]
+    [Message] <|-- [BC_RT_Message]
+    [Message] <|-- [RT_BC_Message]
+    [Message] <|-- [RT_RT_Message]
+    [Message] <|-- [MC Message]
+    [Frame]
+    [Frame] <|-- [AcyclicFrame]
+    [Frame] <|-- [MinorFrame]
+    [Frame] <|-- [MajorFrame]
+    [MIL_STD_1553_Config] --* [Frame]
+    [MIL_STD_1553_Config] --* [Message]
+}
+
+package "Readers" {
+    [MIL_1553_Reader]
+    [MIL_1553_Reader] <|-- [Excel_1553_Reader]
+}
+
+"Configuration File" <-- [MIL_1553_Reader] : Consumes
+[MIL_1553_Reader] --> [MIL_STD_1553_Config] : Generates
+
+package "Translators" {
+    [MIL_1553_Translator]
+    [MIL_1553_Translator] <|-- [BTI_1553_ParameterTranslator]
+    [MIL_1553_Translator] <|-- [BTI_1553_HardwareTranslator]
+}
+
+"XML Files" <-- [MIL_1553_Translator] : Creates
+[MIL_1553_Translator] --> [MIL_STD_1553_Config] : Consumes
+
+package "Schemas" {
+    [BTI_1553_HW]
+    [BTI_1553_Parameters]
+}
+
+[MIL_1553_Translator] --> [BTI_1553_HW]
+[MIL_1553_Translator] --> [BTI_1553_Parameters]
+@enduml

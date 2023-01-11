@@ -177,7 +177,3 @@ def test_create_major_frames():
 
     for ref in test_frame.minor_frame_ref:
         assert ref.minor_frame_idref in frame_ids
-
-
-if __name__ == "__main__":
-    test_create_acyclic_frames()

@@ -593,9 +593,9 @@ if __name__ == "__main__":
 
     # Translate configs
     parameter_translator = BTI_1553_ParameterTranslator(reader.config)
-    parameters_xml = parameter_translator.generate_parameters_xml()
-
     hw_translator = BTI_1553_HardwareTranslator(reader.config)
+
+    parameters_xml = parameter_translator.generate_parameters_xml()
     hw_xml = hw_translator.generate_hw_xml()
 
     # Pretty print
