@@ -26,6 +26,13 @@ class Parameters:
     class Meta:
         name = "parameters"
 
+    version: Optional[str] = field(
+        default=None,
+        metadata={
+            "type": "Element",
+            "name": "version",
+        },
+    )
     channel: List["Parameters.Channel"] = field(
         default_factory=list,
         metadata={
@@ -47,6 +54,13 @@ class Parameters:
                 "max_inclusive": 255,
             },
         )
+        bus_controller: Optional["Parameters.Channel.BusController"] = field(
+            default=None,
+            metadata={
+                "name": "busController",
+                "type": "Element",
+            },
+        )
         terminals: Optional["Parameters.Channel.Terminals"] = field(
             default=None,
             metadata={
@@ -66,6 +80,23 @@ class Parameters:
                 "type": "Element",
             },
         )
+
+        @dataclass
+        class BusController:
+            simulate: bool = field(
+                default=False,
+                metadata={
+                    "name": "simulate",
+                    "type": "Element",
+                },
+            )
+            name: Optional[str] = field(
+                default=None,
+                metadata={
+                    "name": "name",
+                    "type": "Element",
+                },
+            )
 
         @dataclass
         class Terminals:

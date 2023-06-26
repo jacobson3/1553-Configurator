@@ -91,15 +91,22 @@ class BTI_1553_ParameterTranslator(MIL_1553_Translator):
         """
         Returns XML string representing the VeriStand parameters XML for BTI 1553 hardware
         """
+        bus_controller = self._create_bus_controller()
         messages = self._create_messages()
         terminals = self._create_terminals()
         acyclic_frames = self._create_acyclic_frames()
         serializer = XmlSerializer()
 
-        channel = Parameters.Channel(0, terminals, acyclic_frames, messages)
-        parameters = Parameters([channel])
+        channel = Parameters.Channel(0, bus_controller, terminals, acyclic_frames, messages)
+        parameters = Parameters("1.1", [channel])
 
         return serializer.render(parameters)
+
+    def _create_bus_controller(self) -> Parameters.Channel.BusController:
+        """
+        Create BusController dataclass to be flattened to parameters XML
+        """
+        return Parameters.Channel.BusController()
 
     def _create_messages(self) -> List[Parameters.Channel.Message]:
         """
@@ -190,7 +197,7 @@ class BTI_1553_ParameterTranslator(MIL_1553_Translator):
         """
         Create terminal data objects to be flattened to XML
         """
-        terminal_set = set([0])  # Always include BC
+        terminal_set = set()
 
         # Add any terminal address to set if it is referenced in a message
         for message in self.messages:
@@ -398,7 +405,6 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         return hw.MessageBuffer1553Type(id=id, name=buffer_name)
 
     def _create_acyclic_frames(self, messages: hw.Messages1553Type) -> hw.AcyclicFrames1553Type:
-
         acyclic_frames = [
             self._create_acyclic_frame(frame, messages) for frame in self.acyclic_frames
         ]
@@ -410,7 +416,6 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         frame: types.AcyclicFrame,
         messages: hw.Messages1553Type,
     ) -> hw.AcyclicFrame1553Type:
-
         # Convert list of message names into list of corresponding message ids
         message_ids = [self._get_message_id(name, messages) for name in frame.schedule]
 
@@ -430,7 +435,6 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
             return filtered_messages[0].id
 
     def _create_minor_frames(self, messages: hw.Messages1553Type) -> hw.MinorFrames1553Type:
-
         minor_frames = [self._create_minor_frame(frame, messages) for frame in self.minor_frames]
 
         return hw.MinorFrames1553Type(minor_frames)
@@ -440,7 +444,6 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         frame: types.MinorFrame,
         messages: hw.Messages1553Type,
     ) -> hw.MinorFrame1553Type:
-
         # Convert list of message names into list of corresponding message ids
         message_ids = [self._get_message_id(name, messages) for name in frame.schedule]
 
@@ -462,7 +465,6 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
     def _get_frame_refs(
         self, schedule: List[str], frames: hw.MinorFrames1553Type
     ) -> List[hw.MinorFrameRef1553Type]:
-
         frame_refs = []
 
         for name in schedule:
@@ -478,7 +480,6 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         return frame_refs
 
     def _create_remote_terminals_type(self) -> hw.RemoteTerminals1553Type:
-
         # Gather set of all terminal addresses referenced in messages
         message_terminals = [message.list_terminals() for message in self.messages]
         terminals = set().union(*message_terminals)
@@ -488,7 +489,6 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
         return hw.RemoteTerminals1553Type(remote_terminals)
 
     def _create_remote_terminal(self, terminal_address: int) -> hw.RemoteTerminal1553Type:
-
         message_buffers = []
         sub_addresses = []
         mode_codes = []
@@ -541,7 +541,6 @@ class BTI_1553_HardwareTranslator(MIL_1553_Translator):
     def _create_sub_address(
         self, message: types.Message, terminal_address: int, buffer_id: int
     ) -> hw.SubAddress1553Type:
-
         if isinstance(message, types.BC_RT_Message):
             sub_address = hw.SubAddress1553Type(
                 self._get_uid(),
